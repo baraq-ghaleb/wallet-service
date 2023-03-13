@@ -1,0 +1,3 @@
+Remove the full path in server.go for writeFile functions
+
+
