@@ -3,7 +3,7 @@ package domain
 import (
 	"math/big"
 
-	"github.com/polygonid/sh-id-platform/internal/common"
+	"github.com/lastingasset/wallet-service/internal/common"
 )
 
 // ZKProof is structure that represents SnarkJS library result of proof generation

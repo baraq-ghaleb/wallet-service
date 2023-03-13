@@ -7,12 +7,12 @@ import (
 	core "github.com/iden3/go-iden3-core"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/core/services"
-	"github.com/polygonid/sh-id-platform/internal/loader"
-	"github.com/polygonid/sh-id-platform/internal/repositories"
-	"github.com/polygonid/sh-id-platform/pkg/reverse_hash"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/core/services"
+	"github.com/lastingasset/wallet-service/internal/loader"
+	"github.com/lastingasset/wallet-service/internal/repositories"
+	"github.com/lastingasset/wallet-service/pkg/reverse_hash"
 )
 
 const (

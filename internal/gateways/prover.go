@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/polygonid/sh-id-platform/internal/config"
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/core/services"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	client "github.com/polygonid/sh-id-platform/pkg/http"
-	"github.com/polygonid/sh-id-platform/pkg/loaders"
+	"github.com/lastingasset/wallet-service/internal/config"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/core/services"
+	"github.com/lastingasset/wallet-service/internal/log"
+	client "github.com/lastingasset/wallet-service/pkg/http"
+	"github.com/lastingasset/wallet-service/pkg/loaders"
 )
 
 // ProverConfig represents prover server config

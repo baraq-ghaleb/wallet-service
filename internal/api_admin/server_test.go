@@ -9,11 +9,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/polygonid/sh-id-platform/internal/core/services"
-	"github.com/polygonid/sh-id-platform/internal/health"
-	"github.com/polygonid/sh-id-platform/internal/loader"
-	"github.com/polygonid/sh-id-platform/internal/repositories"
-	"github.com/polygonid/sh-id-platform/pkg/reverse_hash"
+	"github.com/lastingasset/wallet-service/internal/core/services"
+	"github.com/lastingasset/wallet-service/internal/health"
+	"github.com/lastingasset/wallet-service/internal/loader"
+	"github.com/lastingasset/wallet-service/internal/repositories"
+	"github.com/lastingasset/wallet-service/pkg/reverse_hash"
 )
 
 func TestServer_CheckStatus(t *testing.T) {

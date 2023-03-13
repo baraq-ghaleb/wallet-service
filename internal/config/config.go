@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/polygonid/sh-id-platform/internal/log"
+	"github.com/lastingasset/wallet-service/internal/log"
 )
 
 // CIConfigPath variable contain the CI configuration path

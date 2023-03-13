@@ -8,9 +8,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/iden3/iden3comm"
 
-	"github.com/polygonid/sh-id-platform/internal/config"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/health"
+	"github.com/lastingasset/wallet-service/internal/config"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/health"
 )
 
 // Server implements StrictServerInterface and holds the implementation of all API controllers

@@ -7,8 +7,8 @@ import (
 	"github.com/iden3/go-merkletree-sql/v2"
 	proof "github.com/iden3/merkletree-proof"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/log"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/log"
 )
 
 // stateHashes - handle hashes states.

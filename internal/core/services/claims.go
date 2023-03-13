@@ -18,13 +18,13 @@ import (
 	"github.com/iden3/iden3comm/packers"
 	"github.com/iden3/iden3comm/protocol"
 
-	"github.com/polygonid/sh-id-platform/internal/common"
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/db"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/internal/repositories"
-	"github.com/polygonid/sh-id-platform/pkg/rand"
+	"github.com/lastingasset/wallet-service/internal/common"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/db"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/internal/repositories"
+	"github.com/lastingasset/wallet-service/pkg/rand"
 )
 
 var (

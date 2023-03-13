@@ -11,9 +11,9 @@ import (
 	"github.com/iden3/go-schema-processor/verifiable"
 	"github.com/jackc/pgtype"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/loader"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/loader"
 )
 
 type schema struct {

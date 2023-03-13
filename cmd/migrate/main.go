@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/polygonid/sh-id-platform/internal/config"
-	"github.com/polygonid/sh-id-platform/internal/db/schema"
-	"github.com/polygonid/sh-id-platform/internal/log"
+	"github.com/lastingasset/wallet-service/internal/config"
+	"github.com/lastingasset/wallet-service/internal/db/schema"
+	"github.com/lastingasset/wallet-service/internal/log"
 
 	_ "github.com/lib/pq"
 )

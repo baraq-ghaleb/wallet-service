@@ -11,15 +11,15 @@ import (
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/iden3comm"
 
-	"github.com/polygonid/sh-id-platform/internal/config"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/db"
-	"github.com/polygonid/sh-id-platform/internal/db/tests"
-	"github.com/polygonid/sh-id-platform/internal/errors"
-	"github.com/polygonid/sh-id-platform/internal/kms"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/internal/providers"
-	"github.com/polygonid/sh-id-platform/pkg/cache"
+	"github.com/lastingasset/wallet-service/internal/config"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/db"
+	"github.com/lastingasset/wallet-service/internal/db/tests"
+	"github.com/lastingasset/wallet-service/internal/errors"
+	"github.com/lastingasset/wallet-service/internal/kms"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/internal/providers"
+	"github.com/lastingasset/wallet-service/pkg/cache"
 )
 
 var (

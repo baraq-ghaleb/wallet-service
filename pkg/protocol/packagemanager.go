@@ -11,9 +11,9 @@ import (
 	"github.com/iden3/iden3comm"
 	"github.com/iden3/iden3comm/packers"
 
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/pkg/blockchain/eth"
-	"github.com/polygonid/sh-id-platform/pkg/loaders"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/pkg/blockchain/eth"
+	"github.com/lastingasset/wallet-service/pkg/loaders"
 )
 
 // InitPackageManager initializes the iden3comm package manager

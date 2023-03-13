@@ -5,8 +5,8 @@ import (
 
 	core "github.com/iden3/go-iden3-core"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/db"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/db"
 )
 
 // IndentityRepository is the interface implemented by the identity service

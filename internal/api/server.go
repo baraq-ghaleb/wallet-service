@@ -16,14 +16,14 @@ import (
 	"github.com/iden3/iden3comm/packers"
 	"github.com/iden3/iden3comm/protocol"
 
-	"github.com/polygonid/sh-id-platform/internal/config"
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/core/services"
-	"github.com/polygonid/sh-id-platform/internal/gateways"
-	"github.com/polygonid/sh-id-platform/internal/health"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/internal/repositories"
+	"github.com/lastingasset/wallet-service/internal/config"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/core/services"
+	"github.com/lastingasset/wallet-service/internal/gateways"
+	"github.com/lastingasset/wallet-service/internal/health"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/internal/repositories"
 )
 
 // Server implements StrictServerInterface and holds the implementation of all API controllers

@@ -12,7 +12,7 @@ import (
 	comm "github.com/iden3/iden3comm"
 	"github.com/iden3/iden3comm/protocol"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
 )
 
 // CreateClaimRequest struct

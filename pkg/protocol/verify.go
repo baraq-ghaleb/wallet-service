@@ -12,8 +12,8 @@ import (
 	"github.com/iden3/iden3comm/packers"
 	"github.com/pkg/errors"
 
-	"github.com/polygonid/sh-id-platform/internal/common"
-	"github.com/polygonid/sh-id-platform/pkg/blockchain/eth"
+	"github.com/lastingasset/wallet-service/internal/common"
+	"github.com/lastingasset/wallet-service/pkg/blockchain/eth"
 )
 
 // ErrStateNotFound issuer state is genesis state.

@@ -16,10 +16,10 @@ import (
 	"github.com/iden3/go-schema-processor/verifiable"
 	proof "github.com/iden3/merkletree-proof"
 
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/pkg/blockchain/eth"
-	client "github.com/polygonid/sh-id-platform/pkg/http"
-	"github.com/polygonid/sh-id-platform/pkg/protocol"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/pkg/blockchain/eth"
+	client "github.com/lastingasset/wallet-service/pkg/http"
+	"github.com/lastingasset/wallet-service/pkg/protocol"
 )
 
 const (

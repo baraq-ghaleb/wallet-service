@@ -9,8 +9,8 @@ import (
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/go-merkletree-sql/v2"
 
-	"github.com/polygonid/sh-id-platform/internal/db"
-	"github.com/polygonid/sh-id-platform/internal/log"
+	"github.com/lastingasset/wallet-service/internal/db"
+	"github.com/lastingasset/wallet-service/internal/log"
 )
 
 const (

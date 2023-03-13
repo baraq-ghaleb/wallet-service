@@ -18,7 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/params"
 
-	"github.com/polygonid/sh-id-platform/internal/log"
+	"github.com/lastingasset/wallet-service/internal/log"
 )
 
 const (

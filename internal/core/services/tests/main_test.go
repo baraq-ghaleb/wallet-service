@@ -7,13 +7,13 @@ import (
 
 	"github.com/hashicorp/vault/api"
 
-	"github.com/polygonid/sh-id-platform/internal/config"
-	"github.com/polygonid/sh-id-platform/internal/db"
-	"github.com/polygonid/sh-id-platform/internal/db/tests"
-	"github.com/polygonid/sh-id-platform/internal/kms"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/internal/providers"
-	"github.com/polygonid/sh-id-platform/pkg/cache"
+	"github.com/lastingasset/wallet-service/internal/config"
+	"github.com/lastingasset/wallet-service/internal/db"
+	"github.com/lastingasset/wallet-service/internal/db/tests"
+	"github.com/lastingasset/wallet-service/internal/kms"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/internal/providers"
+	"github.com/lastingasset/wallet-service/pkg/cache"
 )
 
 var (

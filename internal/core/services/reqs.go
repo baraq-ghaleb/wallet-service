@@ -5,14 +5,16 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/db"
-	"github.com/polygonid/sh-id-platform/internal/log"
+	"github.com/iden3/go-circuits"
+	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/db"
+	"github.com/lastingasset/wallet-service/internal/log"
 )
 
 var (
-	ErrAuthRequestNotFound = errors.New("authRequest not found")          // ErrAuthRequestNotFound Cannot retrieve the given authRequest 	// ErrProcessSchema Cannot process schema
+	ErrAuthRequestNotFound = errors.New("authRequest not found") // ErrAuthRequestNotFound Cannot retrieve the given authRequest 	// ErrProcessSchema Cannot process schema
 )
 
 // AuthRequestCfg authRequest service configuration
@@ -59,7 +61,21 @@ func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAu
 		log.Warn(ctx, "validating create authRequest request", "req", req)
 		return nil, err
 	}
-	
+
+	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
+	mtpProofRequest.ID = 1
+	mtpProofRequest.CircuitID = string(circuits.AtomicQuerySigV2CircuitID)
+	mtpProofRequest.Query = map[string]interface{}{
+		"allowedIssuers": []string{"*"},
+		"credentialSubject": map[string]interface{}{
+			"birthday": map[string]interface{}{
+				"$lt": 20000101,
+			},
+		},
+		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
+		"type":    "KYCAgeCredential",
+	}
+
 	authRequest, err := domain.FromAuthRequester()
 	if err != nil {
 		log.Error(ctx, "Can not obtain the claim from claimer", err)

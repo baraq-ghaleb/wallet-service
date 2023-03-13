@@ -20,17 +20,17 @@ import (
 	"github.com/iden3/go-schema-processor/verifiable"
 	"github.com/jackc/pgx/v4"
 
-	"github.com/polygonid/sh-id-platform/internal/common"
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/db"
-	"github.com/polygonid/sh-id-platform/internal/kms"
-	"github.com/polygonid/sh-id-platform/internal/loader"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/internal/repositories"
-	"github.com/polygonid/sh-id-platform/pkg/blockchain/eth"
-	"github.com/polygonid/sh-id-platform/pkg/credentials/signature/circuit/signer"
-	"github.com/polygonid/sh-id-platform/pkg/protocol"
+	"github.com/lastingasset/wallet-service/internal/common"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/db"
+	"github.com/lastingasset/wallet-service/internal/kms"
+	"github.com/lastingasset/wallet-service/internal/loader"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/internal/repositories"
+	"github.com/lastingasset/wallet-service/pkg/blockchain/eth"
+	"github.com/lastingasset/wallet-service/pkg/credentials/signature/circuit/signer"
+	"github.com/lastingasset/wallet-service/pkg/protocol"
 )
 
 const (

@@ -21,15 +21,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/polygonid/sh-id-platform/internal/common"
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
-	"github.com/polygonid/sh-id-platform/internal/core/ports"
-	"github.com/polygonid/sh-id-platform/internal/core/services"
-	"github.com/polygonid/sh-id-platform/internal/db/tests"
-	"github.com/polygonid/sh-id-platform/internal/loader"
-	"github.com/polygonid/sh-id-platform/internal/log"
-	"github.com/polygonid/sh-id-platform/internal/repositories"
-	"github.com/polygonid/sh-id-platform/pkg/reverse_hash"
+	"github.com/lastingasset/wallet-service/internal/common"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/ports"
+	"github.com/lastingasset/wallet-service/internal/core/services"
+	"github.com/lastingasset/wallet-service/internal/db/tests"
+	"github.com/lastingasset/wallet-service/internal/loader"
+	"github.com/lastingasset/wallet-service/internal/log"
+	"github.com/lastingasset/wallet-service/internal/repositories"
+	"github.com/lastingasset/wallet-service/pkg/reverse_hash"
 )
 
 func TestServer_CreateIdentity(t *testing.T) {
@@ -560,7 +560,7 @@ func TestServer_GetClaimQrCode(t *testing.T) {
 	claimsConf := services.ClaimCfg{
 		RHSEnabled: false,
 		Host:       "host",
-	}	
+	}
 	authRequestsConf := services.AuthRequestCfg{
 		RHSEnabled: false,
 		Host:       "host",

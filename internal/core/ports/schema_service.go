@@ -8,7 +8,7 @@ import (
 	"github.com/iden3/go-schema-processor/processor"
 	"github.com/iden3/go-schema-processor/verifiable"
 
-	"github.com/polygonid/sh-id-platform/internal/core/domain"
+	"github.com/lastingasset/wallet-service/internal/core/domain"
 )
 
 // SchemaService is the interface implemented by the Schema service

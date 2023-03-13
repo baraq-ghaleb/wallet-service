@@ -1,4 +1,4 @@
-module github.com/polygonid/sh-id-platform
+module github.com/lastingasset/wallet-service
 
 go 1.19
 
