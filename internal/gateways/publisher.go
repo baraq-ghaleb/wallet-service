@@ -447,3 +447,126 @@ func (p *publisher) checkStatus(ctx context.Context, state *domain.IdentityState
 	log.Info(ctx, "transaction status updated", "tx", *state.TxID)
 	return nil
 }
+
+// PublishProof creates a proof based on a query
+func (p *publisher) generateProof(ctx context.Context, identifier *core.DID, newState domain.IdentityState) (*string, error) {
+	did, err := core.ParseDID(newState.Identifier)
+	if err != nil {
+		return nil, err
+	}
+
+	// 1. Get latest transacted state
+	latestState, err := p.identityService.GetLatestStateByID(ctx, did)
+	if err != nil {
+		return nil, err
+	}
+
+	latestStateHash, err := merkletree.NewHashFromHex(*latestState.State)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: core.IdenState should be calculated before state stored to db
+	newStateHash, err := merkletree.NewHashFromHex(*newState.State)
+	if err != nil {
+		return nil, err
+	}
+
+	newTreeState, err := newState.ToTreeState()
+	if err != nil {
+		return nil, err
+	}
+
+	authClaim, err := p.claimService.GetAuthClaimForPublishing(ctx, did, *newState.State)
+	if err != nil {
+		return nil, err
+	}
+
+	claimKeyID, err := p.identityService.GetKeyIDFromAuthClaim(ctx, authClaim)
+	if err != nil {
+		return nil, err
+	}
+
+	oldTreeState, err := latestState.ToTreeState()
+	if err != nil {
+		return nil, err
+	}
+
+	circuitAuthClaim, circuitAuthClaimNewStateIncProof, err := p.fillAuthClaimData(ctx, did, authClaim, newState)
+	if err != nil {
+		return nil, err
+	}
+
+	hashOldAndNewStates, err := poseidon.Hash([]*big.Int{oldTreeState.State.BigInt(), newStateHash.BigInt()})
+	if err != nil {
+		return nil, err
+	}
+
+	sigDigest := kms.BJJDigest(hashOldAndNewStates)
+	sigBytes, err := p.kms.Sign(ctx, claimKeyID, sigDigest)
+	if err != nil {
+		return nil, err
+	}
+
+	signature, err := kms.DecodeBJJSignature(sigBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	isLatestStateGenesis := latestState.PreviousState == nil
+	stateTransitionInputs := circuits.StateTransitionInputs{
+		ID:                &did.ID,
+		NewTreeState:      newTreeState,
+		OldTreeState:      oldTreeState,
+		IsOldStateGenesis: isLatestStateGenesis,
+
+		AuthClaim:          circuitAuthClaim.Claim,
+		AuthClaimIncMtp:    circuitAuthClaim.IncProof.Proof,
+		AuthClaimNonRevMtp: circuitAuthClaim.NonRevProof.Proof,
+
+		AuthClaimNewStateIncMtp: circuitAuthClaimNewStateIncProof,
+		Signature:               signature,
+	}
+
+	jsonInputs, err := stateTransitionInputs.InputsMarshal()
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Integrate when it's finished
+	fullProof, err := p.zkService.Generate(ctx, jsonInputs, string(circuits.StateTransitionCircuitID))
+	if err != nil {
+		return nil, err
+	}
+
+	// 7. Publish state and receive txID
+
+	txID, err := p.publisherGateway.PublishState(ctx, did, latestStateHash, newStateHash, isLatestStateGenesis, fullProof.Proof)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Info(ctx, "Success!", "TxID", txID)
+
+	// 8. Update state with txID value (block values are still default because tx is not confirmed)
+
+	newState.Status = domain.StatusTransacted
+	newState.TxID = txID
+
+	err = p.identityService.UpdateIdentityState(ctx, &newState)
+	if err != nil {
+		return nil, err
+	}
+
+	// add go routine that will listen for transaction status update
+
+	go func(ctx context.Context) {
+		if err := p.updateTransactionStatus(ctx, newState, *txID); err != nil {
+			log.Error(ctx, "cannot update transaction status", err)
+		}
+		p.pendingTransactions.Delete(identifier.String())
+	}(ctx)
+
+	return txID, nil
+}
+

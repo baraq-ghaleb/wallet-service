@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/big"
 	"net/http"
 	"os"
 	"strings"
@@ -31,6 +32,7 @@ import (
 type Server struct {
 	cfg              *config.Configuration
 	identityService  ports.IdentityService
+	proofService     ports.ProofService
 	claimService     ports.ClaimsService
 	reqService       ports.ReqsService
 	schemaService    ports.SchemaService
@@ -40,10 +42,11 @@ type Server struct {
 }
 
 // NewServer is a Server constructor
-func NewServer(cfg *config.Configuration, identityService ports.IdentityService, claimsService ports.ClaimsService, reqsService ports.ReqsService, schemaService ports.SchemaService, publisherGateway ports.Publisher, packageManager *iden3comm.PackageManager, health *health.Status) *Server {
+func NewServer(cfg *config.Configuration, identityService ports.IdentityService, proofService ports.ProofService, claimsService ports.ClaimsService, reqsService ports.ReqsService, schemaService ports.SchemaService, publisherGateway ports.Publisher, packageManager *iden3comm.PackageManager, health *health.Status) *Server {
 	return &Server{
 		cfg:              cfg,
 		identityService:  identityService,
+		proofService:     proofService,
 		claimService:     claimsService,
 		reqService:       reqsService,
 		schemaService:    schemaService,
@@ -131,7 +134,21 @@ func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthReques
 		}
 		return CreateAuthRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	}
-	return CreateAuthRequest201JSONResponse{Id: resp.ID.String()}, nil
+
+	authProof, err := s.proofService.GenerateAuthProof(ctx, did, big.NewInt(11)) 
+	//s.reqService.VerifyAuthRequestResponse(resp, )
+
+	// q := ports.Query{}
+	// q.CircuitID = string(circuitID)
+	// q.Challenge = new(big.Int).SetBytes(hash)
+	// circuitInputs, _, err := s.proofService.PrepareInputs(ctx, id, q)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+
+
+	return CreateAuthRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
 }
 
 // CreateClaim is claim creation controller

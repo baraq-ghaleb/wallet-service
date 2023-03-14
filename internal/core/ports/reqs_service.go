@@ -6,8 +6,8 @@ import (
 	"time"
 
 	core "github.com/iden3/go-iden3-core"
+	"github.com/iden3/iden3comm/protocol"
 
-	"github.com/lastingasset/wallet-service/internal/core/domain"
 )
 
 // CreateAuthRequestRequest struct
@@ -48,5 +48,6 @@ func NewCreateAuthRequestRequest(did *core.DID, credentialSchema string, credent
 
 // AuthRequestsService is the interface implemented by the authRequest service
 type ReqsService interface {
-	CreateAuthRequest(ctx context.Context, authRequestReq *CreateAuthRequestRequest) (*domain.AuthRequest, error)
+	CreateAuthRequest(ctx context.Context, authRequestReq *CreateAuthRequestRequest) (protocol.AuthorizationRequestMessage, error)
+	VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) (bool)
 }

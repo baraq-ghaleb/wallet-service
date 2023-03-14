@@ -12,4 +12,5 @@ import (
 type Publisher interface {
 	PublishState(ctx context.Context, identity *core.DID) (*domain.PublishedState, error)
 	CheckTransactionStatus(ctx context.Context)
+	 
 }

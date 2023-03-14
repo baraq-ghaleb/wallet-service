@@ -26,6 +26,7 @@ import (
 	"github.com/lastingasset/wallet-service/internal/core/ports"
 	"github.com/lastingasset/wallet-service/internal/core/services"
 	"github.com/lastingasset/wallet-service/internal/db/tests"
+	"github.com/lastingasset/wallet-service/internal/gateways"
 	"github.com/lastingasset/wallet-service/internal/loader"
 	"github.com/lastingasset/wallet-service/internal/log"
 	"github.com/lastingasset/wallet-service/internal/repositories"
@@ -48,6 +49,7 @@ func TestServer_CreateIdentity(t *testing.T) {
 	rhsp := reverse_hash.NewRhsPublisher(nil, false)
 	identityService := services.NewIdentity(&KMSMock{}, identityRepo, mtRepo, identityStateRepo, mtService, claimsRepo, revocationRepository, storage, rhsp)
 	schemaService := services.NewSchema(loader.CachedFactory(loader.HTTPFactory, cachex))
+	zkProofService := services.NewProofService(claimsService, revocationService, identityService, mtService, claimsRepo, proofService, keyStore, storage, stateContract, schemaLoader)
 
 	claimsConf := services.ClaimCfg{
 		RHSEnabled: false,
@@ -182,7 +184,9 @@ func TestServer_RevokeClaim(t *testing.T) {
 	rhsp := reverse_hash.NewRhsPublisher(nil, false)
 	identityService := services.NewIdentity(&KMSMock{}, identityRepo, mtRepo, identityStateRepo, mtService, claimsRepo, revocationRepository, storage, rhsp)
 	schemaService := services.NewSchema(loader.CachedFactory(loader.HTTPFactory, cachex))
+	proofService := gateways.NewProver(cfg, circuitsLoaderService)
 
+	
 	claimsConf := services.ClaimCfg{
 		RHSEnabled: false,
 		Host:       "host",
@@ -194,7 +198,7 @@ func TestServer_RevokeClaim(t *testing.T) {
 	claimsService := services.NewClaim(claimsRepo, schemaService, identityService, mtService, identityStateRepo, storage, claimsConf)
 	reqsService := services.NewAuthRequest(reqsRepo, schemaService, identityService, mtService, identityStateRepo, storage, authRequestsConf)
 
-	server := NewServer(&cfg, identityService, claimsService, reqsService, schemaService, NewPublisherMock(), NewPackageManagerMock(), nil)
+	server := NewServer(&cfg, identityService, proofService, claimsService, reqsService, schemaService, NewPublisherMock(), NewPackageManagerMock(), nil)
 
 	idStr := "did:polygonid:polygon:mumbai:2qM77fA6NGGWL9QEeb1dv2VA6wz5svcohgv61LZ7wB"
 	identity := &domain.Identity{

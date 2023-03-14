@@ -44,29 +44,31 @@ var (
 
 // Proof service generates and validates ZK zk
 type Proof struct {
-	claimSrv         ports.ClaimsService
-	revocationSrv    ports.RevocationService
-	identitySrv      ports.IdentityService
-	mtService        ports.MtService
-	claimsRepository ports.ClaimsRepository
-	keyProvider      *kms.KMS
-	storage          *db.Storage
-	stateContract    *eth.State
-	schemaLoader     loader.Factory
+	claimService         ports.ClaimsService
+	revocationService    ports.RevocationService
+	identityService      ports.IdentityService
+	mtService            ports.MtService
+	claimsRepository     ports.ClaimsRepository
+	zkService            ports.ZKGenerator
+	keyProvider          *kms.KMS
+	storage              *db.Storage
+	stateContract        *eth.State
+	schemaLoader         loader.Factory
 }
 
 // NewProofService init proof service
-func NewProofService(claimSrv ports.ClaimsService, revocationSrv ports.RevocationService, identitySrv ports.IdentityService, mtService ports.MtService, claimsRepository ports.ClaimsRepository, keyProvider *kms.KMS, storage *db.Storage, stateContract *eth.State, ld loader.Factory) ports.ProofService {
+func NewProofService(claimService ports.ClaimsService, revocationService ports.RevocationService, identityService ports.IdentityService, mtService ports.MtService, claimsRepository ports.ClaimsRepository, zkService ports.ZKGenerator, keyProvider *kms.KMS, storage *db.Storage, stateContract *eth.State, ld loader.Factory) ports.ProofService {
 	return &Proof{
-		claimSrv:         claimSrv,
-		revocationSrv:    revocationSrv,
-		identitySrv:      identitySrv,
-		mtService:        mtService,
-		claimsRepository: claimsRepository,
-		keyProvider:      keyProvider,
-		storage:          storage,
-		stateContract:    stateContract,
-		schemaLoader:     ld,
+		claimService:       claimService,
+		revocationService:  revocationService,
+		identityService:    identityService,
+		mtService:          mtService,
+		claimsRepository:   claimsRepository,
+		zkService:          zkService,
+		keyProvider:        keyProvider,
+		storage:            storage,
+		stateContract:      stateContract,
+		schemaLoader:       ld,
 	}
 }
 
@@ -230,7 +232,7 @@ func (p *Proof) getClaimDataForAtomicQueryCircuit(ctx context.Context, identifie
 			return nil, nil, err
 		}
 		var c *domain.Claim
-		c, err = p.claimSrv.GetByID(ctx, identifier, claimUUID)
+		c, err = p.claimService.GetByID(ctx, identifier, claimUUID)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -298,7 +300,7 @@ func (p *Proof) checkRevocationStatus(ctx context.Context, claim *domain.Claim) 
 		return nil, err
 	}
 
-	claimRs, err = p.revocationSrv.Status(ctx, cs, issuerDID)
+	claimRs, err = p.revocationService.Status(ctx, cs, issuerDID)
 	if err != nil && errors.Is(err, protocol.ErrStateNotFound) {
 
 		bjp := new(verifiable.BJJSignatureProof2021)
@@ -478,7 +480,7 @@ func (p *Proof) prepareNonMerklizedQuery(ctx context.Context, jsonSchemaURL stri
 }
 
 func (p *Proof) callNonRevProof(ctx context.Context, issuerData verifiable.IssuerData, issuerDID *core.DID) (circuits.MTProof, error) {
-	nonRevProof, err := p.revocationSrv.Status(ctx, issuerData.CredentialStatus, issuerDID)
+	nonRevProof, err := p.revocationService.Status(ctx, issuerData.CredentialStatus, issuerDID)
 
 	if err != nil && errors.Is(err, protocol.ErrStateNotFound) {
 		state, errIn := merkletree.NewHashFromHex(*issuerData.State.Value)
@@ -517,7 +519,7 @@ func (p *Proof) callNonRevProof(ctx context.Context, issuerData verifiable.Issue
 }
 
 func (p *Proof) prepareAuthV2Circuit(ctx context.Context, identifier *core.DID, challenge *big.Int) (circuits.AuthV2Inputs, error) {
-	authClaim, err := p.claimSrv.GetAuthClaim(ctx, identifier)
+	authClaim, err := p.claimService.GetAuthClaim(ctx, identifier)
 	if err != nil {
 		return circuits.AuthV2Inputs{}, err
 	}
@@ -539,7 +541,7 @@ func (p *Proof) prepareAuthV2Circuit(ctx context.Context, identifier *core.DID, 
 }
 
 func (p *Proof) signChallange(ctx context.Context, authClaim *domain.Claim, challenge *big.Int) (*babyjub.Signature, error) {
-	signingKeyID, err := p.identitySrv.GetKeyIDFromAuthClaim(ctx, authClaim)
+	signingKeyID, err := p.identityService.GetKeyIDFromAuthClaim(ctx, authClaim)
 	if err != nil {
 		return nil, err
 	}
@@ -562,7 +564,7 @@ func (p *Proof) fillAuthClaimData(ctx context.Context, identifier *core.DID, aut
 		ctx, func(tx pgx.Tx) error {
 			var errIn error
 			var idState *domain.IdentityState
-			idState, errIn = p.identitySrv.GetLatestStateByID(ctx, identifier)
+			idState, errIn = p.identityService.GetLatestStateByID(ctx, identifier)
 			if errIn != nil {
 				return errIn
 			}
@@ -741,4 +743,25 @@ func parseQueryWithoutSlot(req map[string]interface{}) (circuits.Query, string, 
 		Values:    []*big.Int{},
 		SlotIndex: 0,
 	}, "", nil
+}
+
+func (p *Proof) GenerateAuthProof(ctx context.Context, identifier *core.DID, challenge *big.Int) (*domain.FullProof, error) {
+
+	circuitInputs, err := p.prepareAuthV2Circuit(ctx, identifier, challenge)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonInputs, err := circuitInputs.InputsMarshal()
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Integrate when it's finished
+	fullProof, err := p.zkService.Generate(ctx, jsonInputs, string(circuits.AuthV2CircuitID))
+	if err != nil {
+		return nil, err
+	}
+	
+	return fullProof, nil
 }
