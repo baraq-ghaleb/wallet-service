@@ -31,4 +31,5 @@ func (q *Query) SchemaType() string {
 type ProofService interface {
 	PrepareInputs(ctx context.Context, identifier *core.DID, query Query) ([]byte, []*domain.Claim, error)
 	GenerateAuthProof(ctx context.Context, identifier *core.DID, challenge *big.Int) (*domain.FullProof, error)
+	GenerateAgeProof(ctx context.Context, identifier *core.DID, query Query) (*domain.FullProof, error)
 }

@@ -82,7 +82,7 @@ func (p *Proof) PrepareInputs(ctx context.Context, identifier *core.DID, query p
 
 	var circuitInputs circuits.InputsMarshaller
 	switch circuits.CircuitID(query.CircuitID) {
-	case circuits.AtomicQuerySigV2CircuitID:
+	case circuits.AtomicQuerySigV2OnChainCircuitID:
 		circuitInputs, claim, err = p.prepareAtomicQuerySigV2Circuit(ctx, identifier, query)
 		if err != nil {
 			return nil, nil, err
@@ -759,6 +759,32 @@ func (p *Proof) GenerateAuthProof(ctx context.Context, identifier *core.DID, cha
 
 	// TODO: Integrate when it's finished
 	fullProof, err := p.zkService.Generate(ctx, jsonInputs, string(circuits.AuthV2CircuitID))
+	if err != nil {
+		return nil, err
+	}
+	
+	return fullProof, nil
+}
+
+func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, query ports.Query) (*domain.FullProof, error) {
+
+	circuitInputs, claim, err := p.prepareAtomicQuerySigV2Circuit(ctx, identifier, query)
+
+	if claim == nil {
+		return nil, err
+	}
+	
+	if err != nil {
+		return nil, err
+	}
+
+	jsonInputs, err := circuitInputs.InputsMarshal()
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Integrate when it's finished
+	fullProof, err := p.zkService.Generate(ctx, jsonInputs, string(circuits.AtomicQuerySigV2OnChainCircuitID))
 	if err != nil {
 		return nil, err
 	}

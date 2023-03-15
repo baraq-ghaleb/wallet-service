@@ -11,7 +11,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
+	"github.com/iden3/go-rapidsnark/types"
 	"github.com/iden3/go-schema-processor/verifiable"
 	"github.com/iden3/iden3comm"
 	"github.com/iden3/iden3comm/packers"
@@ -135,20 +137,109 @@ func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthReques
 		return CreateAuthRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	}
 
-	authProof, err := s.proofService.GenerateAuthProof(ctx, did, big.NewInt(11)) 
+	authProof, err := s.proofService.GenerateAuthProof(ctx, did, big.NewInt(12345)) 
+	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query) 
 	//s.reqService.VerifyAuthRequestResponse(resp, )
 
-	// q := ports.Query{}
-	// q.CircuitID = string(circuitID)
-	// q.Challenge = new(big.Int).SetBytes(hash)
-	// circuitInputs, _, err := s.proofService.PrepareInputs(ctx, id, q)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	var message protocol.AuthorizationResponseMessage
+	message.Typ = packers.MediaTypePlainMessage
+	message.Type = protocol.AuthorizationResponseMessageType
+	message.From = resp.From
+	message.To = resp.To
+	message.ID = uuid.New().String()
+	message.ThreadID = resp.ThreadID
+	message.Body = protocol.AuthorizationMessageResponseBody{
+		Message: resp.Body.Message,
+		Scope: []protocol.ZeroKnowledgeProofResponse{
+			{
+				ID:        12345,
+				CircuitID: string(circuits.AuthV2CircuitID),
+				ZKProof: types.ZKProof{
+					Proof: (*types.ProofData)(authProof.Proof),
+					PubSignals: authProof.PubSignals,
+				},
+			},
+		},
+	}
+
+	verified := s.reqService.VerifyAuthRequestResponse(ctx, &resp, &message)
+	if (verified) {
+		return CreateAuthRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
+	} else {
+		return CreateAuthRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
+	} 
+}
 
 
+// CreateAuthRequest is QueryRequest creation controller
+func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequestRequestObject) (CreateQueryRequestResponseObject, error) {
+	did, err := core.ParseDID(request.Identifier)
+	if err != nil {
+		return CreateQueryRequest400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
+	}
 
-	return CreateAuthRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
+	req := ports.NewCreateQueryRequestRequest(did, request.Body.CredentialSchema, request.Body.CredentialSubject, request.Body.Expiration, request.Body.Type, request.Body.Version, request.Body.SubjectPosition, request.Body.MerklizedRootPosition)
+
+	resp, err := s.reqService.CreateQueryRequest(ctx, req)
+	if err != nil {
+		if errors.Is(err, services.ErrJSONLdContext) {
+			return CreateQueryRequest400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
+		}
+		if errors.Is(err, services.ErrProcessSchema) {
+			return CreateQueryRequest400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
+		}
+		if errors.Is(err, services.ErrLoadingSchema) {
+			return CreateQueryRequest422JSONResponse{N422JSONResponse{Message: err.Error()}}, nil
+		}
+		if errors.Is(err, services.ErrMalformedURL) {
+			return CreateQueryRequest400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
+		}
+		return CreateQueryRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
+	}
+
+	q := ports.Query{}
+	q.CircuitID = string(circuits.AtomicQuerySigV2OnChainCircuitID)
+	q.SkipClaimRevocationCheck = false
+	q.AllowedIssuers = "*"
+	q.Type = "KYCAgeCredential"
+	q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
+	q.Req = map[string]interface{}{
+		"birthday": map[string]interface{}{
+			"$lt": float64(20220101),
+		},
+	}
+	
+	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q) 
+	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query) 
+	//s.reqService.VerifyAuthRequestResponse(resp, )
+
+	var message protocol.AuthorizationResponseMessage
+	message.Typ = packers.MediaTypePlainMessage
+	message.Type = protocol.AuthorizationResponseMessageType
+	message.From = resp.From
+	message.To = resp.To
+	message.ID = uuid.New().String()
+	message.ThreadID = resp.ThreadID
+	message.Body = protocol.AuthorizationMessageResponseBody{
+		Message: resp.Body.Message,
+		Scope: []protocol.ZeroKnowledgeProofResponse{
+			{
+				ID:        12345,
+				CircuitID: string(circuits.AtomicQuerySigV2OnChainCircuitID),
+				ZKProof: types.ZKProof{
+					Proof: (*types.ProofData)(authProof.Proof),
+					PubSignals: authProof.PubSignals,
+				},
+			},
+		},
+	}
+
+	verified := s.reqService.VerifyAuthRequestResponse(ctx, &resp, &message)
+	if (verified) {
+		return CreateQueryRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
+	} else {
+		return CreateQueryRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
+	} 
 }
 
 // CreateClaim is claim creation controller

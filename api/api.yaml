@@ -378,6 +378,40 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+#query_requests:
+  /v1/{identifier}/query-reqs:
+    post:
+      summary: Create Query Request
+      operationId: CreateQueryRequest
+      description: Endpoint to create an query request
+      tags:
+        - QueryRequest
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/pathIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQueryRequestRequest'
+      responses:
+        '201':
+          description: Query request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateQueryRequestResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+        '500':
+          $ref: '#/components/responses/500'
+
 components:
   securitySchemes:
     basicAuth:
@@ -492,7 +526,7 @@ components:
         rootOfRoots:
           type: string
 
-    #reqs
+    #auth-reqs
     CreateAuthRequestRequest:
       type: object
       required:
@@ -529,9 +563,57 @@ components:
           id: "fill with did"
           birthday: 19960424
           documentType: 2
-        expiration: 12345
+        expiration: 1710508549
 
     CreateAuthRequestResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          x-omitempty: false
+    
+    #query-reqs
+    CreateQueryRequestRequest:
+      type: object
+      required:
+        - credentialSchema
+        - type
+        - credentialSubject
+      properties:
+        credentialSchema:
+          type: string
+          x-omitempty: false
+        type:
+          type: string
+          x-omitempty: false
+        credentialSubject:
+          type: object
+          x-omitempty: false
+        expiration:
+          type: integer
+          format: int64
+        version:
+          type: integer
+          format: uint32
+        revNonce:
+          type: integer
+          format: uint64
+        subjectPosition:
+          type: string
+        merklizedRootPosition:
+          type: string
+      example:
+        credentialSchema: "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json/KYCAgeCredential-v3.json"
+        type: "KYCAgeCredential"
+        credentialSubject:
+          id: "fill with did"
+          birthday: 19960424
+          documentType: 2
+        expiration: 1710508549
+
+    CreateQueryRequestResponse:
       type: object
       required:
         - id
@@ -577,7 +659,7 @@ components:
           id: "fill with did"
           birthday: 19960424
           documentType: 2
-        expiration: 12345
+        expiration: 1710508549
 
     CreateClaimResponse:
       type: object

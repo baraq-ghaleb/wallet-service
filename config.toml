@@ -1,5 +1,5 @@
 ServerPort = 3001
-ServerUrl = "http://localhost"
+ServerUrl = "http://localhost:3001"
 NativeProofGenerationEnabled = true
 PublishingKeyPath = "pbkey"
 OnChainCheckStatusFrecuency = "30s"

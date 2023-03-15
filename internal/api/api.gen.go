@@ -86,6 +86,23 @@ type CreateIdentityResponse struct {
 	State      *IdentityState `json:"state,omitempty"`
 }
 
+// CreateQueryRequestRequest defines model for CreateQueryRequestRequest.
+type CreateQueryRequestRequest struct {
+	CredentialSchema      string                 `json:"credentialSchema"`
+	CredentialSubject     map[string]interface{} `json:"credentialSubject"`
+	Expiration            *int64                 `json:"expiration,omitempty"`
+	MerklizedRootPosition *string                `json:"merklizedRootPosition,omitempty"`
+	RevNonce              *uint64                `json:"revNonce,omitempty"`
+	SubjectPosition       *string                `json:"subjectPosition,omitempty"`
+	Type                  string                 `json:"type"`
+	Version               *uint32                `json:"version,omitempty"`
+}
+
+// CreateQueryRequestResponse defines model for CreateQueryRequestResponse.
+type CreateQueryRequestResponse struct {
+	Id string `json:"id"`
+}
+
 // CredentialSchema defines model for CredentialSchema.
 type CredentialSchema struct {
 	Id   string `json:"id"`
@@ -250,6 +267,9 @@ type CreateAuthRequestJSONRequestBody = CreateAuthRequestRequest
 // CreateClaimJSONRequestBody defines body for CreateClaim for application/json ContentType.
 type CreateClaimJSONRequestBody = CreateClaimRequest
 
+// CreateQueryRequestJSONRequestBody defines body for CreateQueryRequest for application/json ContentType.
+type CreateQueryRequestJSONRequestBody = CreateQueryRequestRequest
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Get the documentation
@@ -291,6 +311,9 @@ type ServerInterface interface {
 	// Get Claim QR code
 	// (GET /v1/{identifier}/claims/{id}/qrcode)
 	GetClaimQrCode(w http.ResponseWriter, r *http.Request, identifier PathIdentifier, id PathClaim)
+	// Create Query Request
+	// (POST /v1/{identifier}/query-reqs)
+	CreateQueryRequest(w http.ResponseWriter, r *http.Request, identifier PathIdentifier)
 	// Publish Identity State
 	// (POST /v1/{identifier}/state/publish)
 	PublishIdentityState(w http.ResponseWriter, r *http.Request, identifier PathIdentifier)
@@ -680,6 +703,34 @@ func (siw *ServerInterfaceWrapper) GetClaimQrCode(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
+// CreateQueryRequest operation middleware
+func (siw *ServerInterfaceWrapper) CreateQueryRequest(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "identifier" -------------
+	var identifier PathIdentifier
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "identifier", runtime.ParamLocationPath, chi.URLParam(r, "identifier"), &identifier)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "identifier", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BasicAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateQueryRequest(w, r, identifier)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
 // PublishIdentityState operation middleware
 func (siw *ServerInterfaceWrapper) PublishIdentityState(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -859,6 +910,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/v1/{identifier}/claims/{id}/qrcode", wrapper.GetClaimQrCode)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/v1/{identifier}/query-reqs", wrapper.CreateQueryRequest)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/v1/{identifier}/state/publish", wrapper.PublishIdentityState)
@@ -1384,6 +1438,60 @@ func (response GetClaimQrCode500JSONResponse) VisitGetClaimQrCodeResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
+type CreateQueryRequestRequestObject struct {
+	Identifier PathIdentifier `json:"identifier"`
+	Body       *CreateQueryRequestJSONRequestBody
+}
+
+type CreateQueryRequestResponseObject interface {
+	VisitCreateQueryRequestResponse(w http.ResponseWriter) error
+}
+
+type CreateQueryRequest201JSONResponse CreateQueryRequestResponse
+
+func (response CreateQueryRequest201JSONResponse) VisitCreateQueryRequestResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateQueryRequest400JSONResponse struct{ N400JSONResponse }
+
+func (response CreateQueryRequest400JSONResponse) VisitCreateQueryRequestResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateQueryRequest401JSONResponse struct{ N401JSONResponse }
+
+func (response CreateQueryRequest401JSONResponse) VisitCreateQueryRequestResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateQueryRequest422JSONResponse struct{ N422JSONResponse }
+
+func (response CreateQueryRequest422JSONResponse) VisitCreateQueryRequestResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateQueryRequest500JSONResponse struct{ N500JSONResponse }
+
+func (response CreateQueryRequest500JSONResponse) VisitCreateQueryRequestResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PublishIdentityStateRequestObject struct {
 	Identifier PathIdentifier `json:"identifier"`
 }
@@ -1478,6 +1586,9 @@ type StrictServerInterface interface {
 	// Get Claim QR code
 	// (GET /v1/{identifier}/claims/{id}/qrcode)
 	GetClaimQrCode(ctx context.Context, request GetClaimQrCodeRequestObject) (GetClaimQrCodeResponseObject, error)
+	// Create Query Request
+	// (POST /v1/{identifier}/query-reqs)
+	CreateQueryRequest(ctx context.Context, request CreateQueryRequestRequestObject) (CreateQueryRequestResponseObject, error)
 	// Publish Identity State
 	// (POST /v1/{identifier}/state/publish)
 	PublishIdentityState(ctx context.Context, request PublishIdentityStateRequestObject) (PublishIdentityStateResponseObject, error)
@@ -1873,6 +1984,39 @@ func (sh *strictHandler) GetClaimQrCode(w http.ResponseWriter, r *http.Request, 
 	}
 }
 
+// CreateQueryRequest operation middleware
+func (sh *strictHandler) CreateQueryRequest(w http.ResponseWriter, r *http.Request, identifier PathIdentifier) {
+	var request CreateQueryRequestRequestObject
+
+	request.Identifier = identifier
+
+	var body CreateQueryRequestJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateQueryRequest(ctx, request.(CreateQueryRequestRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateQueryRequest")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateQueryRequestResponseObject); ok {
+		if err := validResponse.VisitCreateQueryRequestResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("Unexpected response type: %T", response))
+	}
+}
+
 // PublishIdentityState operation middleware
 func (sh *strictHandler) PublishIdentityState(w http.ResponseWriter, r *http.Request, identifier PathIdentifier) {
 	var request PublishIdentityStateRequestObject
@@ -1902,51 +2046,53 @@ func (sh *strictHandler) PublishIdentityState(w http.ResponseWriter, r *http.Req
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"AA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

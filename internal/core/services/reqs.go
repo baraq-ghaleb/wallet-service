@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/iden3/go-circuits"
 	auth "github.com/iden3/go-iden3-auth"
 	"github.com/iden3/go-iden3-auth/loaders"
 	"github.com/iden3/go-iden3-auth/pubsignals"
@@ -71,47 +72,61 @@ func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAu
 	}
 
 	const CallBackUrl      = "http:localhost:8001/call-back"
-	const VerifierIdentity = "1125GJqgw6YEsKFwj63GY87MMxPL9kwDKxPUiwMLNZ"
+	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
 
-    request := auth.CreateAuthorizationRequest("10", VerifierIdentity, "")
-	request.ID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
+    request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
+	request.ID = "6789"
 	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
+	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
+	mtpProofRequest.ID = 12345
+	mtpProofRequest.CircuitID = string(circuits.AuthV2CircuitID)
+	mtpProofRequest.Query = map[string]interface{}{
+	   "allowedIssuers": []string{"*"},
+		"credentialSubject": map[string]interface{}{
+			"birthday": map[string]interface{}{
+				"$lt": 20000101,
+			},
+		},
+		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
+		"type":    "KYCAgeCredential",
+	}
+	
+	request.Body.Scope = append(request.Body.Scope, mtpProofRequest) 
+
 	return request, err
-	// if claimID NOT exist in request select all claims and filter it.
-	// claims, err = auth.findClaimForQuery(ctx, identifier, query)
-	// if err != nil {
-	// 	return claim, nil, err
-	// }
+}
 
-	// var mtpProofRequest protocol.ZeroKnowledgeProofRequest
-	// mtpProofRequest.ID = 1
-	// mtpProofRequest.CircuitID = string(circuits.AtomicQuerySigV2CircuitID)
-	// mtpProofRequest.Query = map[string]interface{}{
-	// 	"allowedIssuers": []string{"*"},
-	// 	"credentialSubject": map[string]interface{}{
-	// 		"birthday": map[string]interface{}{
-	// 			"$lt": 20000101,
-	// 		},
-	// 	},
-	// 	"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
-	// 	"type":    "KYCAgeCredential",
-	// }
+func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQueryRequestRequest) (protocol.AuthorizationRequestMessage, error) {
+	err := a.guardCreateQueryRequestRequest(req);
+	if err != nil {
+		log.Warn(ctx, "validating create queryRequest request", "req", req)
+	}
 
+	const CallBackUrl      = "http:localhost:8001/call-back"
+	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
 
+    request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
+	request.ID = "6789"
+	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
-	// authRequest, err := domain.FromAuthRequester()
-	// if err != nil {
-	// 	log.Error(ctx, "Can not obtain the claim from claimer", err)
-	// 	return nil, err
-	// }
+	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
+	mtpProofRequest.ID = 12345
+	mtpProofRequest.CircuitID = string(circuits.AuthV2CircuitID)
+	mtpProofRequest.Query = map[string]interface{}{
+	   "allowedIssuers": []string{"*"},
+		"credentialSubject": map[string]interface{}{
+			"birthday": map[string]interface{}{
+				"$lt": 20000101,
+			},
+		},
+		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
+		"type":    "KYCAgeCredential",
+	}
+	
+	request.Body.Scope = append(request.Body.Scope, mtpProofRequest) 
 
-	// claimResp, err := a.save(ctx, authRequest)
-	// if err != nil {
-	// 	log.Error(ctx, "Can not save the claim", err)
-	// 	return nil, err
-	// }
-	// return claimResp, err
+	return request, err
 }
 
 func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) (bool) {
@@ -142,7 +157,42 @@ func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizati
 	return true
 }
 
+func (a *authRequest) VerifyQueryRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) (bool) {
+	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/authV2"
+	// circuitsLoaderService := pkgloader.NewCircuits("/home/zakwan/wallet-service/pkg/credentials/circuits")
+
+	// authV2Set, err := circuitsLoaderService.Load(circuits.AuthV2CircuitID)
+
+	var verificationKeyloader = &loaders.FSKeyLoader{Dir: keyDIR}
+
+	URL := "https://polygon-mumbai.g.alchemy.com/v2/jNN6BxHCdHmxeTFcHHz-6DG7VTqX1tPY"
+	contractAddress := "0x134B1BE34911E39A8397ec6289782989729807a4"
+
+	resolver := state.ETHResolver{
+		RPCUrl:          URL,
+		ContractAddress:  common.HexToAddress(contractAddress),
+	}
+
+	resolvers := map[string]pubsignals.StateResolver{
+		"polygon:mumbai": resolver,
+	}
+	verifier := auth.NewVerifier(verificationKeyloader, loaders.DefaultSchemaLoader{IpfsURL: "ipfs.io"}, resolvers)		
+
+	err := verifier.VerifyAuthResponse(ctx, *authorizationResponseMessage, *authorizationRequestMessage)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (c *authRequest) guardCreateAuthRequestRequest(req *ports.CreateAuthRequestRequest) error {
+	if _, err := url.ParseRequestURI(req.Schema); err != nil {
+		return ErrMalformedURL
+	}
+	return nil
+}
+
+func (c *authRequest) guardCreateQueryRequestRequest(req *ports.CreateQueryRequestRequest) error {
 	if _, err := url.ParseRequestURI(req.Schema); err != nil {
 		return ErrMalformedURL
 	}
