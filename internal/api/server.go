@@ -210,6 +210,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	q.Challenge = big.NewInt(6789)
 	q.ClaimID = "68ad469f-c33e-11ed-a787-000c2949382b"
 
+
 	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
 	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query)
 	//s.reqService.VerifyAuthRequestResponse(resp, )

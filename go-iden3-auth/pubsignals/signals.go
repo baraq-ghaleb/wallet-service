@@ -34,7 +34,7 @@ func init() {
 	RegisterVerifier(circuits.AuthV2CircuitID, reflect.TypeOf(AuthV2{}))
 	RegisterVerifier(circuits.AtomicQuerySigV2CircuitID, reflect.TypeOf(AtomicQuerySigV2{}))
 	RegisterVerifier(circuits.AtomicQueryMTPV2CircuitID, reflect.TypeOf(AtomicQueryMTPV2{}))
-	RegisterVerifier(circuits.AtomicQueryMTPV2OnChainCircuitID, reflect.TypeOf(AtomicQueryMTPV2{}))
+	RegisterVerifier(circuits.AtomicQueryMTPV2OnChainCircuitID, reflect.TypeOf(AtomicQueryMTPV2OnChain{}))
 }
 
 // GetVerifier return specific public signals verifier

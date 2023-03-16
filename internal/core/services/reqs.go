@@ -106,7 +106,7 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 	const CallBackUrl = "http:localhost:8001/call-back"
 	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
 
-	request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
+	request := auth.CreateAuthorizationRequestWithMessage("12345", "message", VerifierIdentity, CallBackUrl)
 	request.ID = "6789"
 	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
@@ -114,10 +114,10 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 	mtpProofRequest.ID = 12345
 	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
-		"allowedIssuers": []string{"*"},
+		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qN6yj3ceVbacdcsJLHVrnX5nXEE4rTwptKpa16bzs"},
 		"credentialSubject": map[string]interface{}{
 			"birthday": map[string]interface{}{
-				"$lt": 20000101,
+				"$lt": 20220101,
 			},
 		},
 		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
