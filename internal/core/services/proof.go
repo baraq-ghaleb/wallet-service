@@ -234,6 +234,8 @@ func (p *Proof) prepareAtomicQueryMTPV2OnChainCircuit(ctx context.Context, did *
 		return nil, nil, err
 	}
 
+	// revocationNonce := claim.CoreClaim.Get().getGetRevocationNonce()
+	
 	claimInc, err := claim.GetCircuitIncProof()
 	if err != nil {
 		return nil, nil, err
@@ -301,7 +303,10 @@ func (p *Proof) getClaimDataForAtomicQueryCircuit(ctx context.Context, identifie
 			return nil, nil, err
 		}
 		var c *domain.Claim
-		c, err = p.claimService.GetByID(ctx, identifier, claimUUID)
+		//TODO: 
+		did, err := core.ParseDID(query.AllowedIssuers) 
+		c, err = p.claimService.GetByID(ctx, did, claimUUID)
+		
 		if err != nil {
 			return nil, nil, err
 		}
@@ -838,7 +843,7 @@ func (p *Proof) GenerateAuthProof(ctx context.Context, identifier *core.DID, cha
 func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, query ports.Query) (*domain.FullProof, error) {
 
 	circuitInputs, claim, err := p.PrepareInputs(ctx, identifier, query)
-
+	
 	//circuitInputs, claim, err := p.prepareAtomicQueryMTPV2Circuit(ctx, identifier, query)
 
 	if claim == nil {

@@ -200,7 +200,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	q := ports.Query{}
 	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	q.SkipClaimRevocationCheck = true
-	q.AllowedIssuers = "*"
+	q.AllowedIssuers = "did:polygonid:polygon:mumbai:2qN6yj3ceVbacdcsJLHVrnX5nXEE4rTwptKpa16bzs"
 	q.Type = "KYCAgeCredential"
 	q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
 	q.Req = map[string]interface{}{
@@ -208,7 +208,10 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 			"$lt": float64(20220101),
 		},
 	}
-	
+	q.Challenge = big.NewInt(6789);
+	q.ClaimID = "68ad469f-c33e-11ed-a787-000c2949382b"
+
+
 	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q) 
 	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query) 
 	//s.reqService.VerifyAuthRequestResponse(resp, )
@@ -233,6 +236,10 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 			},
 		},
 	}
+
+
+	
+
 
 	verified := s.reqService.VerifyAuthRequestResponse(ctx, &resp, &message)
 	if (verified) {
