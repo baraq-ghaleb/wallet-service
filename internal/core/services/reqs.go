@@ -7,10 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/iden3/go-circuits"
-	auth "github.com/iden3/go-iden3-auth"
-	"github.com/iden3/go-iden3-auth/loaders"
-	"github.com/iden3/go-iden3-auth/pubsignals"
-	"github.com/iden3/go-iden3-auth/state"
+	auth "github.com/lastingasset/wallet-service/go-iden3-auth"
 	"github.com/iden3/iden3comm/protocol"
 	"github.com/lastingasset/wallet-service/internal/core/domain"
 	"github.com/lastingasset/wallet-service/internal/core/ports"
@@ -130,7 +127,7 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 }
 
 func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) (bool) {
-	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/authV2"
+	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/credentialAtomicQueryMTPV2OnChain"
 	// circuitsLoaderService := pkgloader.NewCircuits("/home/zakwan/wallet-service/pkg/credentials/circuits")
 
 	// authV2Set, err := circuitsLoaderService.Load(circuits.AuthV2CircuitID)
