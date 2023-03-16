@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/iden3/go-circuits"
 	"github.com/iden3/go-rapidsnark/types"
-	"github.com/iden3/iden3comm/packers"
-	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/go-circuits"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/pubsignals"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
+	"github.com/lastingasset/wallet-service/iden3comm/packers"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 

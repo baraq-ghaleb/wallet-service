@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/go-schema-processor/verifiable"
-	comm "github.com/iden3/iden3comm"
-	"github.com/iden3/iden3comm/protocol"
+	comm "github.com/lastingasset/wallet-service/iden3comm"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 
 	"github.com/lastingasset/wallet-service/internal/core/domain"
 )

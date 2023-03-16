@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/iden3/iden3comm"
+import "github.com/lastingasset/wallet-service/iden3comm"
 
 // Agent struct
 type Agent struct {

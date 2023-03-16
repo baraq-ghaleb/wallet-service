@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"math/big"
 
-	"github.com/iden3/go-circuits"
+	"github.com/lastingasset/wallet-service/go-circuits"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
 )

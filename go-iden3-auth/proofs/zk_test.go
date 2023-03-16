@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/iden3/go-circuits"
 	"github.com/iden3/go-rapidsnark/types"
-	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/go-circuits"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 	"github.com/stretchr/testify/assert"
 )
 

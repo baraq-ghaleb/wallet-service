@@ -15,8 +15,8 @@ package api
 // 	"github.com/google/uuid"
 // 	core "github.com/iden3/go-iden3-core"
 // 	"github.com/iden3/go-schema-processor/verifiable"
-// 	"github.com/iden3/iden3comm/packers"
-// 	"github.com/iden3/iden3comm/protocol"
+// 	"github.com/lastingasset/wallet-service/iden3comm/packers"
+// 	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 // 	"github.com/mitchellh/mapstructure"
 // 	"github.com/stretchr/testify/assert"
 // 	"github.com/stretchr/testify/require"
@@ -50,8 +50,6 @@ package api
 // 	identityService := services.NewIdentity(&KMSMock{}, identityRepo, mtRepo, identityStateRepo, mtService, claimsRepo, revocationRepository, storage, rhsp)
 // 	schemaService := services.NewSchema(loader.CachedFactory(loader.HTTPFactory, cachex))
 
-
-
 // 	claimsConf := services.ClaimCfg{
 // 		RHSEnabled: false,
 // 		Host:       "host",
@@ -62,8 +60,7 @@ package api
 // 	}
 // 	claimsService := services.NewClaim(claimsRepo, schemaService, identityService, mtService, identityStateRepo, storage, claimsConf)
 // 	reqsService := services.NewAuthRequest(reqsRepo, schemaService, identityService, mtService, identityStateRepo, storage, authRequestsConf)
-	
-	
+
 // 	proofService := gateways.NewProver(circuitsLoaderService)
 // 	zkProofService := services.NewProofService(claimsService, revocationService, identityService, mtService, claimsRepo, proofService, keyStore, storage, stateContract, schemaLoader)
 
@@ -191,7 +188,6 @@ package api
 // 	schemaService := services.NewSchema(loader.CachedFactory(loader.HTTPFactory, cachex))
 // 	proofService := gateways.NewProver(cfg, circuitsLoaderService)
 
-	
 // 	claimsConf := services.ClaimCfg{
 // 		RHSEnabled: false,
 // 		Host:       "host",
@@ -232,7 +228,7 @@ package api
 // 	})
 
 // 	query := tests.ExecQueryParams{
-// 		Query: `INSERT INTO identity_mts (identifier, type) VALUES 
+// 		Query: `INSERT INTO identity_mts (identifier, type) VALUES
 //                                                     ($1, 0),
 //                                                     ($1, 1),
 //                                                     ($1, 2),
@@ -744,7 +740,7 @@ package api
 // 	fixture.CreateClaim(t, claim)
 
 // 	query := tests.ExecQueryParams{
-// 		Query: `INSERT INTO identity_mts (identifier, type) VALUES 
+// 		Query: `INSERT INTO identity_mts (identifier, type) VALUES
 //                                                     ($1, 0),
 //                                                     ($1, 1),
 //                                                     ($1, 2),

@@ -10,7 +10,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/google/uuid"
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/go-iden3-crypto/babyjub"
 	"github.com/iden3/go-merkletree-sql/v2"
@@ -19,6 +18,7 @@ import (
 	"github.com/iden3/go-schema-processor/processor"
 	"github.com/iden3/go-schema-processor/verifiable"
 	"github.com/jackc/pgx/v4"
+	"github.com/lastingasset/wallet-service/go-circuits"
 
 	"github.com/lastingasset/wallet-service/internal/common"
 	"github.com/lastingasset/wallet-service/internal/core/domain"
@@ -44,31 +44,31 @@ var (
 
 // Proof service generates and validates ZK zk
 type Proof struct {
-	claimService         ports.ClaimsService
-	revocationService    ports.RevocationService
-	identityService      ports.IdentityService
-	mtService            ports.MtService
-	claimsRepository     ports.ClaimsRepository
-	zkService            ports.ZKGenerator
-	keyProvider          *kms.KMS
-	storage              *db.Storage
-	stateContract        *eth.State
-	schemaLoader         loader.Factory
+	claimService      ports.ClaimsService
+	revocationService ports.RevocationService
+	identityService   ports.IdentityService
+	mtService         ports.MtService
+	claimsRepository  ports.ClaimsRepository
+	zkService         ports.ZKGenerator
+	keyProvider       *kms.KMS
+	storage           *db.Storage
+	stateContract     *eth.State
+	schemaLoader      loader.Factory
 }
 
 // NewProofService init proof service
 func NewProofService(claimService ports.ClaimsService, revocationService ports.RevocationService, identityService ports.IdentityService, mtService ports.MtService, claimsRepository ports.ClaimsRepository, zkService ports.ZKGenerator, keyProvider *kms.KMS, storage *db.Storage, stateContract *eth.State, ld loader.Factory) ports.ProofService {
 	return &Proof{
-		claimService:       claimService,
-		revocationService:  revocationService,
-		identityService:    identityService,
-		mtService:          mtService,
-		claimsRepository:   claimsRepository,
-		zkService:          zkService,
-		keyProvider:        keyProvider,
-		storage:            storage,
-		stateContract:      stateContract,
-		schemaLoader:       ld,
+		claimService:      claimService,
+		revocationService: revocationService,
+		identityService:   identityService,
+		mtService:         mtService,
+		claimsRepository:  claimsRepository,
+		zkService:         zkService,
+		keyProvider:       keyProvider,
+		storage:           storage,
+		stateContract:     stateContract,
+		schemaLoader:      ld,
 	}
 }
 
@@ -235,7 +235,7 @@ func (p *Proof) prepareAtomicQueryMTPV2OnChainCircuit(ctx context.Context, did *
 	}
 
 	// revocationNonce := claim.CoreClaim.Get().getGetRevocationNonce()
-	
+
 	claimInc, err := claim.GetCircuitIncProof()
 	if err != nil {
 		return nil, nil, err
@@ -279,15 +279,14 @@ func (p *Proof) prepareAtomicQueryMTPV2OnChainCircuit(ctx context.Context, did *
 		Query:                    circuitQuery,
 		CurrentTimeStamp:         time.Now().Unix(),
 		SkipClaimRevocationCheck: query.SkipClaimRevocationCheck,
-		AuthClaim: authClaim.CoreClaim.Get(),
-		GISTProof: globalTree,
-		Challenge: query.Challenge,
-		Signature: signature,
+		AuthClaim:                authClaim.CoreClaim.Get(),
+		GISTProof:                globalTree,
+		Challenge:                query.Challenge,
+		Signature:                signature,
 
 		AuthClaimIncMtp:    authClaimData.IncProof.Proof,
 		AuthClaimNonRevMtp: authClaimData.NonRevProof.Proof,
 		TreeState:          authClaimData.IncProof.TreeState,
-
 	}
 
 	return inputs, claim, nil
@@ -303,10 +302,10 @@ func (p *Proof) getClaimDataForAtomicQueryCircuit(ctx context.Context, identifie
 			return nil, nil, err
 		}
 		var c *domain.Claim
-		//TODO: 
-		did, err := core.ParseDID(query.AllowedIssuers) 
+		//TODO:
+		did, err := core.ParseDID(query.AllowedIssuers)
 		c, err = p.claimService.GetByID(ctx, did, claimUUID)
-		
+
 		if err != nil {
 			return nil, nil, err
 		}
@@ -836,20 +835,20 @@ func (p *Proof) GenerateAuthProof(ctx context.Context, identifier *core.DID, cha
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return fullProof, nil
 }
 
 func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, query ports.Query) (*domain.FullProof, error) {
 
 	circuitInputs, claim, err := p.PrepareInputs(ctx, identifier, query)
-	
+
 	//circuitInputs, claim, err := p.prepareAtomicQueryMTPV2Circuit(ctx, identifier, query)
 
 	if claim == nil {
 		return nil, err
 	}
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -864,6 +863,6 @@ func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, quer
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return fullProof, nil
 }

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/iden3/go-circuits"
+	"github.com/lastingasset/wallet-service/go-circuits"
 	"github.com/pkg/errors"
 )
 
@@ -34,6 +34,7 @@ func init() {
 	RegisterVerifier(circuits.AuthV2CircuitID, reflect.TypeOf(AuthV2{}))
 	RegisterVerifier(circuits.AtomicQuerySigV2CircuitID, reflect.TypeOf(AtomicQuerySigV2{}))
 	RegisterVerifier(circuits.AtomicQueryMTPV2CircuitID, reflect.TypeOf(AtomicQueryMTPV2{}))
+	RegisterVerifier(circuits.AtomicQueryMTPV2OnChainCircuitID, reflect.TypeOf(AtomicQueryMTPV2{}))
 }
 
 // GetVerifier return specific public signals verifier

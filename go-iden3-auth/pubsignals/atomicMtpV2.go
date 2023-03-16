@@ -7,8 +7,8 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
+	"github.com/lastingasset/wallet-service/go-circuits"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
 	"github.com/pkg/errors"
 )

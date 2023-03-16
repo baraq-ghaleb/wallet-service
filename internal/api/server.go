@@ -11,13 +11,13 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/go-rapidsnark/types"
 	"github.com/iden3/go-schema-processor/verifiable"
-	"github.com/iden3/iden3comm"
-	"github.com/iden3/iden3comm/packers"
-	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/go-circuits"
+	"github.com/lastingasset/wallet-service/iden3comm"
+	"github.com/lastingasset/wallet-service/iden3comm/packers"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 
 	"github.com/lastingasset/wallet-service/internal/config"
 	"github.com/lastingasset/wallet-service/internal/core/domain"
@@ -137,8 +137,8 @@ func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthReques
 		return CreateAuthRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	}
 
-	authProof, err := s.proofService.GenerateAuthProof(ctx, did, big.NewInt(12345)) 
-	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query) 
+	authProof, err := s.proofService.GenerateAuthProof(ctx, did, big.NewInt(12345))
+	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query)
 	//s.reqService.VerifyAuthRequestResponse(resp, )
 
 	var message protocol.AuthorizationResponseMessage
@@ -155,7 +155,7 @@ func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthReques
 				ID:        12345,
 				CircuitID: string(circuits.AuthV2CircuitID),
 				ZKProof: types.ZKProof{
-					Proof: (*types.ProofData)(authProof.Proof),
+					Proof:      (*types.ProofData)(authProof.Proof),
 					PubSignals: authProof.PubSignals,
 				},
 			},
@@ -163,13 +163,12 @@ func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthReques
 	}
 
 	verified := s.reqService.VerifyAuthRequestResponse(ctx, &resp, &message)
-	if (verified) {
+	if verified {
 		return CreateAuthRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
 	} else {
 		return CreateAuthRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
-	} 
+	}
 }
-
 
 // CreateAuthRequest is QueryRequest creation controller
 func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequestRequestObject) (CreateQueryRequestResponseObject, error) {
@@ -208,12 +207,11 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 			"$lt": float64(20220101),
 		},
 	}
-	q.Challenge = big.NewInt(6789);
+	q.Challenge = big.NewInt(6789)
 	q.ClaimID = "68ad469f-c33e-11ed-a787-000c2949382b"
 
-
-	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q) 
-	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query) 
+	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
+	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query)
 	//s.reqService.VerifyAuthRequestResponse(resp, )
 
 	var message protocol.AuthorizationResponseMessage
@@ -230,23 +228,19 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 				ID:        12345,
 				CircuitID: string(circuits.AtomicQueryMTPV2OnChainCircuitID),
 				ZKProof: types.ZKProof{
-					Proof: (*types.ProofData)(authProof.Proof),
+					Proof:      (*types.ProofData)(authProof.Proof),
 					PubSignals: authProof.PubSignals,
 				},
 			},
 		},
 	}
 
-
-	
-
-
 	verified := s.reqService.VerifyAuthRequestResponse(ctx, &resp, &message)
-	if (verified) {
+	if verified {
 		return CreateQueryRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
 	} else {
 		return CreateQueryRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
-	} 
+	}
 }
 
 // CreateClaim is claim creation controller

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/iden3/iden3comm"
+	"github.com/lastingasset/wallet-service/iden3comm"
 
 	"github.com/lastingasset/wallet-service/internal/config"
 	"github.com/lastingasset/wallet-service/internal/core/ports"

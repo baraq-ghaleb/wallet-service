@@ -9,11 +9,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/google/uuid"
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/go-iden3-crypto/poseidon"
 	"github.com/iden3/go-merkletree-sql/v2"
 	"github.com/jackc/pgx/v4"
+	"github.com/lastingasset/wallet-service/go-circuits"
 
 	"github.com/lastingasset/wallet-service/internal/core/domain"
 	"github.com/lastingasset/wallet-service/internal/core/ports"
@@ -569,4 +569,3 @@ func (p *publisher) generateProof(ctx context.Context, identifier *core.DID, new
 
 	return txID, nil
 }
-

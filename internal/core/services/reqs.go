@@ -6,12 +6,12 @@ import (
 	"net/url"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/iden3/go-circuits"
-	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/go-circuits"
 	auth "github.com/lastingasset/wallet-service/go-iden3-auth"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/pubsignals"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 	"github.com/lastingasset/wallet-service/internal/core/domain"
 	"github.com/lastingasset/wallet-service/internal/core/ports"
 	"github.com/lastingasset/wallet-service/internal/db"
@@ -42,7 +42,7 @@ type authRequest struct {
 // NewAuthRequest creates a new authRequest service
 func NewAuthRequest(repo ports.ReqsRepository, schemaSrv ports.SchemaService, idenSrv ports.IdentityService, mtService ports.MtService, identityStateRepository ports.IdentityStateRepository, storage *db.Storage, cfg AuthRequestCfg) ports.ReqsService {
 	// r := &protocol.AuthorizationRequestMessage {}
-	
+
 	s := &authRequest{
 		cfg: AuthRequestCfg{
 			RHSEnabled: cfg.RHSEnabled,
@@ -66,15 +66,15 @@ func NewAuthRequest(repo ports.ReqsRepository, schemaSrv ports.SchemaService, id
 
 // TODO: remove or update CreateAuthRequestRequest
 func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAuthRequestRequest) (protocol.AuthorizationRequestMessage, error) {
-	err := a.guardCreateAuthRequestRequest(req);
+	err := a.guardCreateAuthRequestRequest(req)
 	if err != nil {
 		log.Warn(ctx, "validating create authRequest request", "req", req)
 	}
 
-	const CallBackUrl      = "http:localhost:8001/call-back"
+	const CallBackUrl = "http:localhost:8001/call-back"
 	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
 
-    request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
+	request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
 	request.ID = "6789"
 	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
@@ -82,7 +82,7 @@ func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAu
 	mtpProofRequest.ID = 12345
 	mtpProofRequest.CircuitID = string(circuits.AuthV2CircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
-	   "allowedIssuers": []string{"*"},
+		"allowedIssuers": []string{"*"},
 		"credentialSubject": map[string]interface{}{
 			"birthday": map[string]interface{}{
 				"$lt": 20000101,
@@ -91,22 +91,22 @@ func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAu
 		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
 		"type":    "KYCAgeCredential",
 	}
-	
-	request.Body.Scope = append(request.Body.Scope, mtpProofRequest) 
+
+	request.Body.Scope = append(request.Body.Scope, mtpProofRequest)
 
 	return request, err
 }
 
 func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQueryRequestRequest) (protocol.AuthorizationRequestMessage, error) {
-	err := a.guardCreateQueryRequestRequest(req);
+	err := a.guardCreateQueryRequestRequest(req)
 	if err != nil {
 		log.Warn(ctx, "validating create queryRequest request", "req", req)
 	}
 
-	const CallBackUrl      = "http:localhost:8001/call-back"
+	const CallBackUrl = "http:localhost:8001/call-back"
 	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
 
-    request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
+	request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
 	request.ID = "6789"
 	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
@@ -114,7 +114,7 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 	mtpProofRequest.ID = 12345
 	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
-	   "allowedIssuers": []string{"*"},
+		"allowedIssuers": []string{"*"},
 		"credentialSubject": map[string]interface{}{
 			"birthday": map[string]interface{}{
 				"$lt": 20000101,
@@ -123,13 +123,13 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
 		"type":    "KYCAgeCredential",
 	}
-	
-	request.Body.Scope = append(request.Body.Scope, mtpProofRequest) 
+
+	request.Body.Scope = append(request.Body.Scope, mtpProofRequest)
 
 	return request, err
 }
 
-func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) (bool) {
+func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) bool {
 	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/credentialAtomicQueryMTPV2OnChain"
 	// circuitsLoaderService := pkgloader.NewCircuits("/home/zakwan/wallet-service/pkg/credentials/circuits")
 
@@ -142,13 +142,13 @@ func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizati
 
 	resolver := state.ETHResolver{
 		RPCUrl:          URL,
-		ContractAddress:  common.HexToAddress(contractAddress),
+		ContractAddress: common.HexToAddress(contractAddress),
 	}
 
 	resolvers := map[string]pubsignals.StateResolver{
 		"polygon:mumbai": resolver,
 	}
-	verifier := auth.NewVerifier(verificationKeyloader, loaders.DefaultSchemaLoader{IpfsURL: "ipfs.io"}, resolvers)		
+	verifier := auth.NewVerifier(verificationKeyloader, loaders.DefaultSchemaLoader{IpfsURL: "ipfs.io"}, resolvers)
 
 	err := verifier.VerifyAuthResponse(ctx, *authorizationResponseMessage, *authorizationRequestMessage)
 	if err != nil {
@@ -157,7 +157,7 @@ func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizati
 	return true
 }
 
-func (a *authRequest) VerifyQueryRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) (bool) {
+func (a *authRequest) VerifyQueryRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) bool {
 	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/authV2"
 	// circuitsLoaderService := pkgloader.NewCircuits("/home/zakwan/wallet-service/pkg/credentials/circuits")
 
@@ -170,13 +170,13 @@ func (a *authRequest) VerifyQueryRequestResponse(ctx context.Context, authorizat
 
 	resolver := state.ETHResolver{
 		RPCUrl:          URL,
-		ContractAddress:  common.HexToAddress(contractAddress),
+		ContractAddress: common.HexToAddress(contractAddress),
 	}
 
 	resolvers := map[string]pubsignals.StateResolver{
 		"polygon:mumbai": resolver,
 	}
-	verifier := auth.NewVerifier(verificationKeyloader, loaders.DefaultSchemaLoader{IpfsURL: "ipfs.io"}, resolvers)		
+	verifier := auth.NewVerifier(verificationKeyloader, loaders.DefaultSchemaLoader{IpfsURL: "ipfs.io"}, resolvers)
 
 	err := verifier.VerifyAuthResponse(ctx, *authorizationResponseMessage, *authorizationRequestMessage)
 	if err != nil {

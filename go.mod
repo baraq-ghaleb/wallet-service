@@ -11,21 +11,19 @@ require (
 	github.com/go-chi/cors v1.2.1
 	github.com/go-redis/cache/v8 v8.4.4
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golangci/golangci-lint v1.50.1
 	github.com/google/uuid v1.3.0
 	github.com/hashicorp/go-retryablehttp v0.7.0
 	github.com/hashicorp/vault/api v1.9.0
-	github.com/iden3/go-circuits v1.0.2
 	github.com/iden3/go-iden3-core v1.0.0
 	github.com/iden3/go-iden3-crypto v0.0.13
-	github.com/iden3/go-jwz v1.0.0-beta.0
 	github.com/iden3/go-merkletree-sql/db/pgx/v2 v2.0.1
 	github.com/iden3/go-merkletree-sql/v2 v2.0.0
 	github.com/iden3/go-rapidsnark/prover v0.0.9
 	github.com/iden3/go-rapidsnark/types v0.0.2
 	github.com/iden3/go-rapidsnark/witness v0.0.4-0.20230217163707-fad5b5345629
 	github.com/iden3/go-schema-processor v1.1.0
-	github.com/iden3/iden3comm v1.0.0-beta.1
 	github.com/iden3/merkletree-proof v0.0.2-0.20221021174318-7b4a8f585695
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgtype v1.12.0
@@ -293,7 +291,7 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
-	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.3.3 // indirect

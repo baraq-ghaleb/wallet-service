@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
-	"github.com/iden3/iden3comm/packers"
+	"github.com/lastingasset/wallet-service/go-circuits"
+	"github.com/lastingasset/wallet-service/iden3comm/packers"
 	"github.com/pkg/errors"
 
 	"github.com/lastingasset/wallet-service/internal/common"

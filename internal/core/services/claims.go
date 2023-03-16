@@ -15,8 +15,8 @@ import (
 	"github.com/iden3/go-merkletree-sql/v2"
 	"github.com/iden3/go-schema-processor/processor"
 	"github.com/iden3/go-schema-processor/verifiable"
-	"github.com/iden3/iden3comm/packers"
-	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/iden3comm/packers"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 
 	"github.com/lastingasset/wallet-service/internal/common"
 	"github.com/lastingasset/wallet-service/internal/core/domain"

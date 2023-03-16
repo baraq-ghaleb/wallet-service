@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
-	"github.com/iden3/go-jwz"
-	"github.com/iden3/iden3comm"
-	"github.com/iden3/iden3comm/packers"
+	"github.com/lastingasset/wallet-service/go-circuits"
+	"github.com/lastingasset/wallet-service/go-jwz"
+	"github.com/lastingasset/wallet-service/iden3comm"
+	"github.com/lastingasset/wallet-service/iden3comm/packers"
 
 	"github.com/lastingasset/wallet-service/internal/core/ports"
 	"github.com/lastingasset/wallet-service/pkg/blockchain/eth"

@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/iden3/go-circuits"
 	core "github.com/iden3/go-iden3-core"
 	"github.com/iden3/go-schema-processor/verifiable"
 	"github.com/jackc/pgtype"
+	"github.com/lastingasset/wallet-service/go-circuits"
 
 	"github.com/lastingasset/wallet-service/internal/common"
 )

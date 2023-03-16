@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/iden3/go-circuits"
+	"github.com/lastingasset/wallet-service/go-circuits"
 )
 
 // VerificationKeyLoader load verification key bytes for specific circuit

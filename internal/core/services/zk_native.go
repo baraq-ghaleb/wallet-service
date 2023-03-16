@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/iden3/go-circuits"
 	"github.com/iden3/go-rapidsnark/prover"
 	"github.com/iden3/go-rapidsnark/witness"
+	"github.com/lastingasset/wallet-service/go-circuits"
 
 	"github.com/lastingasset/wallet-service/internal/core/domain"
 	"github.com/lastingasset/wallet-service/internal/log"

@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/hashicorp/vault/api"
 	core "github.com/iden3/go-iden3-core"
-	"github.com/iden3/iden3comm"
+	"github.com/lastingasset/wallet-service/iden3comm"
 
 	"github.com/lastingasset/wallet-service/internal/config"
 	"github.com/lastingasset/wallet-service/internal/core/ports"

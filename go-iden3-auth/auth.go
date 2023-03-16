@@ -10,14 +10,14 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/uuid"
-	"github.com/iden3/go-circuits"
-	"github.com/iden3/go-jwz"
-	"github.com/iden3/iden3comm/packers"
-	"github.com/iden3/iden3comm/protocol"
+	"github.com/lastingasset/wallet-service/go-circuits"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/proofs"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/pubsignals"
 	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
+	"github.com/lastingasset/wallet-service/go-jwz"
+	"github.com/lastingasset/wallet-service/iden3comm/packers"
+	"github.com/lastingasset/wallet-service/iden3comm/protocol"
 	"github.com/pkg/errors"
 )
 
@@ -267,6 +267,7 @@ func getPublicSignalsVerifier(circuitID circuits.CircuitID, signals []string) (p
 	}
 	return cv, nil
 }
+
 func findProofByRequestID(arr []protocol.ZeroKnowledgeProofResponse, id uint32) *protocol.ZeroKnowledgeProofResponse {
 	for _, respProof := range arr {
 		if respProof.ID == id {

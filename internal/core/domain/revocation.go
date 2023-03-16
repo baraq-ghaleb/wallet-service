@@ -4,8 +4,8 @@ import (
 	"database/sql/driver"
 	"strconv"
 
-	"github.com/iden3/go-circuits"
 	"github.com/iden3/go-schema-processor/verifiable"
+	"github.com/lastingasset/wallet-service/go-circuits"
 
 	"github.com/lastingasset/wallet-service/internal/common"
 )
