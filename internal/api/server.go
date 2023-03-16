@@ -198,8 +198,8 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	}
 
 	q := ports.Query{}
-	q.CircuitID = string(circuits.AtomicQuerySigV2OnChainCircuitID)
-	q.SkipClaimRevocationCheck = false
+	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	q.SkipClaimRevocationCheck = true
 	q.AllowedIssuers = "*"
 	q.Type = "KYCAgeCredential"
 	q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
@@ -225,7 +225,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 		Scope: []protocol.ZeroKnowledgeProofResponse{
 			{
 				ID:        12345,
-				CircuitID: string(circuits.AtomicQuerySigV2OnChainCircuitID),
+				CircuitID: string(circuits.AtomicQueryMTPV2OnChainCircuitID),
 				ZKProof: types.ZKProof{
 					Proof: (*types.ProofData)(authProof.Proof),
 					PubSignals: authProof.PubSignals,

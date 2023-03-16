@@ -82,7 +82,7 @@ func (p *Proof) PrepareInputs(ctx context.Context, identifier *core.DID, query p
 
 	var circuitInputs circuits.InputsMarshaller
 	switch circuits.CircuitID(query.CircuitID) {
-	case circuits.AtomicQuerySigV2OnChainCircuitID:
+	case circuits.AtomicQuerySigV2CircuitID:
 		circuitInputs, claim, err = p.prepareAtomicQuerySigV2Circuit(ctx, identifier, query)
 		if err != nil {
 			return nil, nil, err
@@ -96,6 +96,12 @@ func (p *Proof) PrepareInputs(ctx context.Context, identifier *core.DID, query p
 		}
 		claims = append(claims, claim)
 
+	case circuits.AtomicQueryMTPV2OnChainCircuitID:
+		circuitInputs, claim, err = p.prepareAtomicQueryMTPV2OnChainCircuit(ctx, identifier, query)
+		if err != nil {
+			return nil, nil, err
+		}
+		claims = append(claims, claim)
 	case circuits.AuthV2CircuitID:
 		circuitInputs, err = p.prepareAuthV2Circuit(ctx, identifier, query.Challenge)
 		if err != nil {
@@ -217,6 +223,69 @@ func (p *Proof) prepareAtomicQueryMTPV2Circuit(ctx context.Context, did *core.DI
 		Query:                    circuitQuery,
 		CurrentTimeStamp:         time.Now().Unix(),
 		SkipClaimRevocationCheck: query.SkipClaimRevocationCheck,
+	}
+
+	return inputs, claim, nil
+}
+
+func (p *Proof) prepareAtomicQueryMTPV2OnChainCircuit(ctx context.Context, did *core.DID, query ports.Query) (circuits.InputsMarshaller, *domain.Claim, error) {
+	claim, claimNonRevProof, err := p.getClaimDataForAtomicQueryCircuit(ctx, did, query)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	claimInc, err := claim.GetCircuitIncProof()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	circuitQuery, err := p.toCircuitsQuery(ctx, *claim, query)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	authClaim, err := p.claimService.GetAuthClaim(ctx, did)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	authClaimData, err := p.fillAuthClaimData(ctx, did, authClaim)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	signature, err := p.signChallange(ctx, authClaim, query.Challenge)
+	if err != nil {
+		return nil, nil, err
+	}
+	globalTree, err := populateGlobalTree(ctx, did, p.stateContract)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	inputs := circuits.AtomicQueryMTPV2OnChainInputs{
+		RequestID:                big.NewInt(defaultAtomicCircuitsID),
+		ID:                       &did.ID,
+		ProfileNonce:             big.NewInt(0),
+		ClaimSubjectProfileNonce: big.NewInt(0),
+		Claim: circuits.ClaimWithMTPProof{
+			IssuerID:    &did.ID, // claim.Issuer,
+			Claim:       claim.CoreClaim.Get(),
+			NonRevProof: *claimNonRevProof,
+			IncProof:    claimInc,
+		},
+		Query:                    circuitQuery,
+		CurrentTimeStamp:         time.Now().Unix(),
+		SkipClaimRevocationCheck: query.SkipClaimRevocationCheck,
+		AuthClaim: authClaim.CoreClaim.Get(),
+		GISTProof: globalTree,
+		Challenge: query.Challenge,
+		Signature: signature,
+
+		AuthClaimIncMtp:    authClaimData.IncProof.Proof,
+		AuthClaimNonRevMtp: authClaimData.NonRevProof.Proof,
+		TreeState:          authClaimData.IncProof.TreeState,
+
 	}
 
 	return inputs, claim, nil
@@ -768,7 +837,9 @@ func (p *Proof) GenerateAuthProof(ctx context.Context, identifier *core.DID, cha
 
 func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, query ports.Query) (*domain.FullProof, error) {
 
-	circuitInputs, claim, err := p.prepareAtomicQuerySigV2Circuit(ctx, identifier, query)
+	circuitInputs, claim, err := p.PrepareInputs(ctx, identifier, query)
+
+	//circuitInputs, claim, err := p.prepareAtomicQueryMTPV2Circuit(ctx, identifier, query)
 
 	if claim == nil {
 		return nil, err
@@ -778,13 +849,13 @@ func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, quer
 		return nil, err
 	}
 
-	jsonInputs, err := circuitInputs.InputsMarshal()
-	if err != nil {
-		return nil, err
-	}
+	// jsonInputs, err := circuitInputs
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// TODO: Integrate when it's finished
-	fullProof, err := p.zkService.Generate(ctx, jsonInputs, string(circuits.AtomicQuerySigV2OnChainCircuitID))
+	fullProof, err := p.zkService.Generate(ctx, circuitInputs, string(circuits.AtomicQueryMTPV2OnChainCircuitID))
 	if err != nil {
 		return nil, err
 	}

@@ -112,7 +112,7 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 
 	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
 	mtpProofRequest.ID = 12345
-	mtpProofRequest.CircuitID = string(circuits.AuthV2CircuitID)
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
 	   "allowedIssuers": []string{"*"},
 		"credentialSubject": map[string]interface{}{
