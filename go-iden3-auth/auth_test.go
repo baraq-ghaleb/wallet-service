@@ -10,9 +10,9 @@ import (
 	"github.com/iden3/go-rapidsnark/types"
 	"github.com/iden3/iden3comm/packers"
 	"github.com/iden3/iden3comm/protocol"
-	"github.com/lastingasset/go-iden3-auth/loaders"
-	"github.com/lastingasset/go-iden3-auth/pubsignals"
-	"github.com/lastingasset/go-iden3-auth/state"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/pubsignals"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 

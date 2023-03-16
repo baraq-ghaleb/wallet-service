@@ -3,6 +3,7 @@ module github.com/lastingasset/wallet-service
 go 1.19
 
 require (
+	github.com/btcsuite/btcd/btcutil v1.1.3
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/ethereum/go-ethereum v1.11.4
 	github.com/getkin/kin-openapi v0.107.0
@@ -45,6 +46,8 @@ require (
 require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
+	github.com/btcsuite/btcd v0.23.0 // indirect
+	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 // indirect
 	github.com/cockroachdb/errors v1.9.1 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
 	github.com/cockroachdb/pebble v0.0.0-20230209160836-829675f94811 // indirect
@@ -122,6 +125,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/golangci/check v0.0.0-20180506172741-cfe4005ccda2 // indirect
@@ -151,7 +155,7 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/holiman/bloomfilter/v2 v2.0.3 // indirect
-	github.com/iden3/go-rapidsnark/verifier v0.0.4-0.20221129112904-b9f8680ca8e2 // indirect
+	github.com/iden3/go-rapidsnark/verifier v0.0.4-0.20221129112904-b9f8680ca8e2
 	github.com/iden3/wasmer-go v0.0.0-20230217163329-62d85068ec47 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect

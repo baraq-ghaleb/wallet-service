@@ -1,15 +1,15 @@
 # go-iden3-auth
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/lastingasset/go-iden3-auth.svg)](https://pkg.go.dev/github.com/lastingasset/go-iden3-auth)
-[![Go Report Card](https://goreportcard.com/badge/github.com/lastingasset/go-iden3-auth)](https://goreportcard.com/report/github.com/lastingasset/go-iden3-auth)
-[![Test](https://github.com/lastingasset/go-iden3-auth/actions/workflows/ci-test.yaml/badge.svg)](https://github.com/lastingasset/go-iden3-auth/actions/workflows/ci-test.yaml)
-[![Lint](https://github.com/lastingasset/go-iden3-auth/actions/workflows/ci-lint.yaml/badge.svg)](https://github.com/lastingasset/go-iden3-auth/actions/workflows/ci-lint.yaml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/lastingasset/wallet-service/go-iden3-auth.svg)](https://pkg.go.dev/github.com/lastingasset/wallet-service/go-iden3-auth)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lastingasset/wallet-service/go-iden3-auth)](https://goreportcard.com/report/github.com/lastingasset/wallet-service/go-iden3-auth)
+[![Test](https://github.com/lastingasset/wallet-service/go-iden3-auth/actions/workflows/ci-test.yaml/badge.svg)](https://github.com/lastingasset/wallet-service/go-iden3-auth/actions/workflows/ci-test.yaml)
+[![Lint](https://github.com/lastingasset/wallet-service/go-iden3-auth/actions/workflows/ci-lint.yaml/badge.svg)](https://github.com/lastingasset/wallet-service/go-iden3-auth/actions/workflows/ci-lint.yaml)
 
 > Library for verification of authorization response messages of communication protocol in JWZ format
 >
 
 
-`go get github.com/lastingasset/go-iden3-auth`
+`go get github.com/lastingasset/wallet-service/go-iden3-auth`
 
 ### General description:
 
@@ -62,7 +62,7 @@ The blockchain verification algorithm is used
    1. A non-empty GIST is returned, equal to the GIST is provided by the user, it means the user is using the latest state.
    2. The non-empty GIST is returned and it’s not equal to the GIST is provided by a user. Gets the transition time of the GIST. The verification party can make a decision if it can accept this state based on that time frame.
 ## How to use:
-1. `go get https://github.com/lastingasset/go-iden3-auth`
+1. `go get https://github.com/lastingasset/wallet-service/go-iden3-auth`
 2. Request generation:
 
    basic auth:

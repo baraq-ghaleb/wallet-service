@@ -8,11 +8,11 @@ import (
 	core "github.com/iden3/go-iden3-core"
 
 	"github.com/golang/mock/gomock"
-	"github.com/lastingasset/go-iden3-auth/state"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
-	mock "github.com/lastingasset/go-iden3-auth/state/mock"
+	mock "github.com/lastingasset/wallet-service/go-iden3-auth/state/mock"
 )
 
 var (

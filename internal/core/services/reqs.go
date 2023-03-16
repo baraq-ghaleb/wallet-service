@@ -7,8 +7,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/iden3/go-circuits"
-	auth "github.com/lastingasset/wallet-service/go-iden3-auth"
 	"github.com/iden3/iden3comm/protocol"
+	auth "github.com/lastingasset/wallet-service/go-iden3-auth"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/loaders"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/pubsignals"
+	"github.com/lastingasset/wallet-service/go-iden3-auth/state"
 	"github.com/lastingasset/wallet-service/internal/core/domain"
 	"github.com/lastingasset/wallet-service/internal/core/ports"
 	"github.com/lastingasset/wallet-service/internal/db"
