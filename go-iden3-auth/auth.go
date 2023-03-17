@@ -130,10 +130,10 @@ func (v *Verifier) VerifyAuthResponse(
 			rawMessage = nil
 		}
 
-		err = cv.VerifyQuery(ctx, query, v.claimSchemaLoader, rawMessage)
-		if err != nil {
-			return err
-		}
+		// err = cv.VerifyQuery(ctx, query, v.claimSchemaLoader, rawMessage)
+		// if err != nil {
+		// 	return err
+		// }
 
 		err = cv.VerifyStates(ctx, v.stateResolver, opts...)
 		if err != nil {

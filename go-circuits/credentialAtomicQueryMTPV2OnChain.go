@@ -364,14 +364,38 @@ func (ao *AtomicQueryMTPV2OnChainPubSignals) PubSignalsUnmarshal(data []byte) er
 		return err
 	}
 
-	//  - claimSchema
-	var schemaInt *big.Int
-	if schemaInt, ok = big.NewInt(0).SetString(sVals[fieldIdx], 10); !ok {
-		return fmt.Errorf("invalid schema value: '%s'", sVals[fieldIdx])
-	}
-	ao.ClaimSchema = core.NewSchemaHashFromInt(schemaInt)
-	fieldIdx++
-	
+	// //  - claimSchema
+	// var schemaInt *big.Int
+	// if schemaInt, ok = big.NewInt(0).SetString(sVals[fieldIdx], 10); !ok {
+	// 	return fmt.Errorf("invalid schema value: '%s'", sVals[fieldIdx])
+	// }
+	// ao.ClaimSchema = core.NewSchemaHashFromInt(schemaInt)
+	// fieldIdx++
+
+	// // - ClaimPathNotExists
+	// if ao.ClaimPathNotExists, err = strconv.Atoi(sVals[fieldIdx]); err != nil {
+	// 	return err
+	// }
+	// fieldIdx++
+
+	// // - ClaimPathKey
+	// if ao.ClaimPathKey, ok = big.NewInt(0).SetString(sVals[fieldIdx], 10); !ok {
+	// 	return fmt.Errorf("invalid claimPathKey: %s", sVals[fieldIdx])
+	// }
+	// fieldIdx++
+
+	// // - slotIndex
+	// if ao.SlotIndex, err = strconv.Atoi(sVals[fieldIdx]); err != nil {
+	// 	return err
+	// }
+	// fieldIdx++
+
+	// // - operator
+	// if ao.Operator, err = strconv.Atoi(sVals[fieldIdx]); err != nil {
+	// 	return err
+	// }
+	// fieldIdx++
+
 	return nil
 }
 

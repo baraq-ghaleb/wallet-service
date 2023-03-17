@@ -28,9 +28,9 @@ func (c *AtomicQueryMTPV2OnChain) VerifyQuery(
 	return query.Check(ctx, schemaLoader, &CircuitOutputs{
 		IssuerID:            c.IssuerID,
 		ClaimSchema:         c.ClaimSchema,
-		// SlotIndex:           c.SlotIndex,
-		// Operator:            c.Operator,
-		// Value:               c.Value,
+		SlotIndex:           c.SlotIndex,
+		Operator:            c.Operator,
+		Value:               c.Value,
 		Timestamp:           c.Timestamp,
 		Merklized:           c.Merklized,
 		// ClaimPathKey:        c.ClaimPathKey,
