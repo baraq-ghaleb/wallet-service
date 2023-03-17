@@ -204,7 +204,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
 	q.Req = map[string]interface{}{
 		"birthday": map[string]interface{}{
-			"$lt": float64(19001010),
+			"$lt": float64(20221010),
 		},
 	}
 	q.Challenge = big.NewInt(6789)

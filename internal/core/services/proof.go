@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -265,7 +266,8 @@ func (p *Proof) prepareAtomicQueryMTPV2OnChainCircuit(ctx context.Context, did *
 		return nil, nil, err
 	}
 
-	issuerId, _ := core.IDFromString("2qKLGWv7JX9fsvGdUupnhE1TMS3rYKEUSu5FHTAX6j")
+	issuerDidLastPart := claim.Issuer[strings.LastIndex(claim.Issuer, ":")+1:]
+	issuerId, _ := core.IDFromString(issuerDidLastPart)
 	inputs := circuits.AtomicQueryMTPV2OnChainInputs{
 		RequestID:                big.NewInt(defaultAtomicCircuitsID),
 		ID:                       &did.ID,
