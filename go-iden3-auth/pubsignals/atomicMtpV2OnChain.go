@@ -27,7 +27,7 @@ func (c *AtomicQueryMTPV2OnChain) VerifyQuery(
 ) error {
 	return query.Check(ctx, schemaLoader, &CircuitOutputs{
 		IssuerID:            c.IssuerID,
-		// ClaimSchema:         c.ClaimSchema,
+		ClaimSchema:         c.ClaimSchema,
 		// SlotIndex:           c.SlotIndex,
 		// Operator:            c.Operator,
 		// Value:               c.Value,

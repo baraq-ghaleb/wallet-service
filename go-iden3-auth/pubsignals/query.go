@@ -139,7 +139,8 @@ func (q Query) verifyIssuer(pubSig *CircuitOutputs) error {
 		return err
 	}
 	for _, issuer := range q.AllowedIssuers {
-		if issuer == "*" || issuer == userDID.String() {
+		uID := userDID.String()
+		if issuer == "*" || issuer == uID {
 			return nil
 		}
 	}

@@ -72,20 +72,20 @@ func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAu
 	}
 
 	const CallBackUrl = "http:localhost:8001/call-back"
-	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
+	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qHWXLmy3YR1Hh6pmzS5GVUUzWtNQi9xcAy2oKVm73"
 
 	request := auth.CreateAuthorizationRequestWithMessage("10", "message", VerifierIdentity, CallBackUrl)
 	request.ID = "6789"
 	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
 	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
-	mtpProofRequest.ID = 12345
+	mtpProofRequest.ID = 10
 	mtpProofRequest.CircuitID = string(circuits.AuthV2CircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
 		"allowedIssuers": []string{"*"},
 		"credentialSubject": map[string]interface{}{
 			"birthday": map[string]interface{}{
-				"$lt": 20000101,
+				"$lt": 20221010,
 			},
 		},
 		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
@@ -104,20 +104,21 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 	}
 
 	const CallBackUrl = "http:localhost:8001/call-back"
-	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qPESaMeCpLvdFBWTnMzTt68Bd9xp1zjBoy1uoPC8S"
+	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qJT3RnL8ZwU7mgQeVjgw6qNpyYTV3Z7CgtxueBdsA"
 
 	request := auth.CreateAuthorizationRequestWithMessage("12345", "message", VerifierIdentity, CallBackUrl)
+	request.To = req.DID.String()
 	request.ID = "6789"
 	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
 
 	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
-	mtpProofRequest.ID = 12345
+	mtpProofRequest.ID = 10
 	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
-		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qN6yj3ceVbacdcsJLHVrnX5nXEE4rTwptKpa16bzs"},
+		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qKLGWv7JX9fsvGdUupnhE1TMS3rYKEUSu5FHTAX6j"},
 		"credentialSubject": map[string]interface{}{
 			"birthday": map[string]interface{}{
-				"$lt": 20220101,
+				"$lt": 20221010,
 			},
 		},
 		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",

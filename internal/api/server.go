@@ -152,7 +152,7 @@ func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthReques
 		Message: resp.Body.Message,
 		Scope: []protocol.ZeroKnowledgeProofResponse{
 			{
-				ID:        12345,
+				ID:        10,
 				CircuitID: string(circuits.AuthV2CircuitID),
 				ZKProof: types.ZKProof{
 					Proof:      (*types.ProofData)(authProof.Proof),
@@ -179,7 +179,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 
 	req := ports.NewCreateQueryRequestRequest(did, request.Body.CredentialSchema, request.Body.CredentialSubject, request.Body.Expiration, request.Body.Type, request.Body.Version, request.Body.SubjectPosition, request.Body.MerklizedRootPosition)
 
-	resp, err := s.reqService.CreateQueryRequest(ctx, req)
+	queryRequest, err := s.reqService.CreateQueryRequest(ctx, req)
 	if err != nil {
 		if errors.Is(err, services.ErrJSONLdContext) {
 			return CreateQueryRequest400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
@@ -199,34 +199,34 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	q := ports.Query{}
 	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	q.SkipClaimRevocationCheck = true
-	q.AllowedIssuers = "did:polygonid:polygon:mumbai:2qN6yj3ceVbacdcsJLHVrnX5nXEE4rTwptKpa16bzs"
+	q.AllowedIssuers = "did:polygonid:polygon:mumbai:2qKLGWv7JX9fsvGdUupnhE1TMS3rYKEUSu5FHTAX6j"
 	q.Type = "KYCAgeCredential"
 	q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
 	q.Req = map[string]interface{}{
 		"birthday": map[string]interface{}{
-			"$lt": float64(20220101),
+			"$lt": float64(20221010),
 		},
 	}
 	q.Challenge = big.NewInt(6789)
-	q.ClaimID = "68ad469f-c33e-11ed-a787-000c2949382b"
+	q.ClaimID = "32421df5-c43f-11ed-928a-000c2949382b"
 
 
 	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
 	// ageProof, err := s.proofService.GenerateAgeProof(ctx, did, resp.Body.Scope[0].Query)
 	//s.reqService.VerifyAuthRequestResponse(resp, )
 
-	var message protocol.AuthorizationResponseMessage
-	message.Typ = packers.MediaTypePlainMessage
-	message.Type = protocol.AuthorizationResponseMessageType
-	message.From = resp.From
-	message.To = resp.To
-	message.ID = uuid.New().String()
-	message.ThreadID = resp.ThreadID
-	message.Body = protocol.AuthorizationMessageResponseBody{
-		Message: resp.Body.Message,
+	var authorizationResponseMessage protocol.AuthorizationResponseMessage
+	authorizationResponseMessage.Typ = packers.MediaTypePlainMessage
+	authorizationResponseMessage.Type = protocol.AuthorizationResponseMessageType
+	authorizationResponseMessage.From = request.Identifier
+	authorizationResponseMessage.To = queryRequest.From
+	authorizationResponseMessage.ID = uuid.New().String()
+	authorizationResponseMessage.ThreadID = queryRequest.ThreadID
+	authorizationResponseMessage.Body = protocol.AuthorizationMessageResponseBody{
+		Message: queryRequest.Body.Message,
 		Scope: []protocol.ZeroKnowledgeProofResponse{
 			{
-				ID:        12345,
+				ID:        10,
 				CircuitID: string(circuits.AtomicQueryMTPV2OnChainCircuitID),
 				ZKProof: types.ZKProof{
 					Proof:      (*types.ProofData)(authProof.Proof),
@@ -236,9 +236,9 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 		},
 	}
 
-	verified := s.reqService.VerifyAuthRequestResponse(ctx, &resp, &message)
+	verified := s.reqService.VerifyAuthRequestResponse(ctx, &queryRequest, &authorizationResponseMessage)
 	if verified {
-		return CreateQueryRequest201JSONResponse{Id: authProof.Proof.Protocol + resp.ID}, nil
+		return CreateQueryRequest201JSONResponse{Id: authProof.Proof.Protocol + queryRequest.ID}, nil
 	} else {
 		return CreateQueryRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	}

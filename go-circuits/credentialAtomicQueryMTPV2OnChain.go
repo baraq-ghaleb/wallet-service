@@ -260,6 +260,10 @@ type AtomicQueryMTPV2OnChainPubSignals struct {
 	IssuerID               *core.ID         `json:"issuerID"`
 	IssuerClaimIdenState   *merkletree.Hash `json:"issuerClaimIdenState"`
 	IssuerClaimNonRevState *merkletree.Hash `json:"issuerClaimNonRevState"`
+	ClaimSchema            core.SchemaHash  `json:"claimSchema"`
+	SlotIndex              int              `json:"slotIndex"`
+	Operator               int              `json:"operator"`
+	Value                  []*big.Int       `json:"value"`
 	Timestamp              int64            `json:"timestamp"`
 	Merklized              int              `json:"merklized"`
 	IsRevocationChecked    int              `json:"isRevocationChecked"` // 0 revocation not check, // 1 for check revocation
@@ -360,6 +364,14 @@ func (ao *AtomicQueryMTPV2OnChainPubSignals) PubSignalsUnmarshal(data []byte) er
 		return err
 	}
 
+	//  - claimSchema
+	var schemaInt *big.Int
+	if schemaInt, ok = big.NewInt(0).SetString(sVals[fieldIdx], 10); !ok {
+		return fmt.Errorf("invalid schema value: '%s'", sVals[fieldIdx])
+	}
+	ao.ClaimSchema = core.NewSchemaHashFromInt(schemaInt)
+	fieldIdx++
+	
 	return nil
 }
 

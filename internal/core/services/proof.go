@@ -265,13 +265,14 @@ func (p *Proof) prepareAtomicQueryMTPV2OnChainCircuit(ctx context.Context, did *
 		return nil, nil, err
 	}
 
+	issuerId, _ := core.IDFromString("2qKLGWv7JX9fsvGdUupnhE1TMS3rYKEUSu5FHTAX6j")
 	inputs := circuits.AtomicQueryMTPV2OnChainInputs{
 		RequestID:                big.NewInt(defaultAtomicCircuitsID),
 		ID:                       &did.ID,
 		ProfileNonce:             big.NewInt(0),
 		ClaimSubjectProfileNonce: big.NewInt(0),
 		Claim: circuits.ClaimWithMTPProof{
-			IssuerID:    &did.ID, // claim.Issuer,
+			IssuerID:    &issuerId,
 			Claim:       claim.CoreClaim.Get(),
 			NonRevProof: *claimNonRevProof,
 			IncProof:    claimInc,
