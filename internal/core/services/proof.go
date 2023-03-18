@@ -856,12 +856,6 @@ func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, quer
 		return nil, err
 	}
 
-	// jsonInputs, err := circuitInputs
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// TODO: Integrate when it's finished
 	fullProof, err := p.zkService.Generate(ctx, circuitInputs, string(circuits.AtomicQueryMTPV2OnChainCircuitID))
 	if err != nil {
 		return nil, err

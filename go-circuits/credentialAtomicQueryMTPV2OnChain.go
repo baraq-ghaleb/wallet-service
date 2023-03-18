@@ -270,6 +270,8 @@ type AtomicQueryMTPV2OnChainPubSignals struct {
 	QueryHash              *big.Int         `json:"circuitQueryHash"`
 	Challenge              *big.Int         `json:"challenge"`
 	GlobalRoot             *merkletree.Hash `json:"gistRoot"`
+	ClaimPathKey           *big.Int         `json:"claimPathKey"`
+	ClaimPathNotExists     int              `json:"claimPathNotExists"`  // 0 for inclusion, 1 for non-inclusion
 }
 
 // PubSignalsUnmarshal unmarshal credentialAtomicQueryMTPV2OnChain.circom public signals array to AtomicQueryMTPPubSignals

@@ -33,7 +33,7 @@ func (c *AtomicQueryMTPV2OnChain) VerifyQuery(
 		Value:               c.Value,
 		Timestamp:           c.Timestamp,
 		Merklized:           c.Merklized,
-		// ClaimPathKey:        c.ClaimPathKey,
+		ClaimPathKey:        c.ClaimPathKey,
 		// ClaimPathNotExists:  c.ClaimPathNotExists,
 		ValueArraySize:      c.ValueArraySize,
 		IsRevocationChecked: c.IsRevocationChecked,
