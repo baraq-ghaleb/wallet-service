@@ -50,6 +50,31 @@ paths:
           $ref: '#/components/responses/500'
   #identity:
   /v1/identities:
+    options:
+      summary: Options request 
+      operationId: ReturnCreateIdentityOptions
+      description: Endpoint to return access control to allow valid websites to call this resource 
+      security:
+        - basicAuth: [ ]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnCreateIdentityOptionsRequest'
+      responses:
+        '200':
+          description: Calling creating identity endpoint is allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnCreateIdentityOptionsResponse'
+          headers:
+            Access-Control-Allow-Origin:
+              type: string
+              default: '*'
+        '500':
+          $ref: '#/components/responses/500-CreateIdentity'
     post:
       summary: Create Identity
       operationId: CreateIdentity
@@ -435,6 +460,12 @@ components:
           example: 'Something happen'
 
     #identity
+
+    ReturnCreateIdentityOptionsRequest:
+      type: object
+      required:
+      properties:
+
     CreateIdentityRequest:
       type: object
       required:
@@ -471,6 +502,8 @@ components:
         state:
           $ref: '#/components/schemas/IdentityState'
 
+    ReturnCreateIdentityOptionsResponse:
+      type: object
     IdentityState:
       type: object
       required:

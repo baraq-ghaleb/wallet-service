@@ -111,6 +111,15 @@ func (s *Server) CreateIdentity(ctx context.Context, request CreateIdentityReque
 	}, nil
 }
 
+// CreateIdentity is created identity controller
+func (s *Server) ReturnCreateIdentityOptions(ctx context.Context, request ReturnCreateIdentityOptionsRequestObject) (ReturnCreateIdentityOptionsResponseObject, error) {
+	headers := new(ReturnCreateIdentityOptions200ResponseHeaders)
+	headers.AccessControlAllowOrigin = "http://localhost:3000"
+	resp := new (ReturnCreateIdentityOptions200JSONResponse)
+	resp.Headers = *headers
+	return resp, nil
+}
+
 // CreateAuthRequest is AuthRequest creation controller
 func (s *Server) CreateAuthRequest(ctx context.Context, request CreateAuthRequestRequestObject) (CreateAuthRequestResponseObject, error) {
 	did, err := core.ParseDID(request.Identifier)
