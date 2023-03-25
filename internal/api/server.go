@@ -281,9 +281,15 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	}
 	
 	const CallBackUrl = "http:localhost:8001/call-back"
-	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qJT3RnL8ZwU7mgQeVjgw6qNpyYTV3Z7CgtxueBdsA"
-
-	authorizationRequestWithMessage := auth.CreateAuthorizationRequestWithMessage("12345", "message", VerifierIdentity, CallBackUrl)
+	verifierIdentity := request.Body.From
+	reason := request.Body.Body.Reason
+	message := request.Body.Body.Message
+	allowedIssuers := (*request.Body.Body.Scope)[0].Query.AllowedIssuers
+	context := (*request.Body.Body.Scope)[0].Query.Context
+	_type := (*request.Body.Body.Scope)[0].Query.Type
+	credentialSubject := (*request.Body.Body.Scope)[0].Query.CredentialSubject
+	
+	authorizationRequestWithMessage := auth.CreateAuthorizationRequestWithMessage(reason, message, verifierIdentity, CallBackUrl)
 	authorizationRequestWithMessage.To = request.Body.To
 	authorizationRequestWithMessage.ID = request.Body.Id
 	authorizationRequestWithMessage.ThreadID = request.Body.Thid
@@ -292,14 +298,10 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	mtpProofRequest.ID = 10
 	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
-		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"},
-		"credentialSubject": map[string]interface{}{
-			"birthday": map[string]interface{}{
-				"$lt": float64(20221010),
-			},
-		},
-		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
-		"type":    "KYCAgeCredential",
+		"allowedIssuers": allowedIssuers,
+		"credentialSubject": credentialSubject,
+		"context": context,
+		"type":    _type,
 	}
 	authorizationRequestWithMessage.Body.Scope = append(authorizationRequestWithMessage.Body.Scope, mtpProofRequest)
 
@@ -324,6 +326,9 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 
 	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
 	
+	if (err != nil) {
+		return GenerateProof500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
+	} 
 	return GenerateProof200JSONResponse{Id: authProof.Proof.Protocol + authorizationRequestWithMessage.ID}, nil
 
 }
