@@ -16,6 +16,7 @@ import (
 	"github.com/iden3/go-rapidsnark/types"
 	"github.com/iden3/go-schema-processor/verifiable"
 	"github.com/lastingasset/wallet-service/go-circuits"
+	auth "github.com/lastingasset/wallet-service/go-iden3-auth"
 	"github.com/lastingasset/wallet-service/iden3comm"
 	"github.com/lastingasset/wallet-service/iden3comm/packers"
 	"github.com/lastingasset/wallet-service/iden3comm/protocol"
@@ -186,7 +187,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	if err != nil {
 		return CreateQueryRequest400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
 	}
-
+	
 	req := ports.NewCreateQueryRequestRequest(did, request.Body.CredentialSchema, request.Body.CredentialSubject, request.Body.Expiration, request.Body.Type, request.Body.Version, request.Body.SubjectPosition, request.Body.MerklizedRootPosition)
 
 	queryRequest, err := s.reqService.CreateQueryRequest(ctx, req)
@@ -233,7 +234,7 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	q.Context = requestQuery["context"].(string)
 	q.Req = requestQuery["credentialSubject"].(map[string]interface{})
 
-	formatted_data, err := json.MarshalIndent(request, "", " ")
+	formatted_data, err := json.MarshalIndent(queryRequest, "", " ")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -271,6 +272,60 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 	} else {
 		return CreateQueryRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	}
+}
+
+func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequestObject) (GenerateProofResponseObject, error) {
+	did, err := core.ParseDID(request.Identifier)
+	if err != nil {
+		return GenerateProof400JSONResponse{N400JSONResponse{Message: err.Error()}}, nil
+	}
+	
+	const CallBackUrl = "http:localhost:8001/call-back"
+	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qJT3RnL8ZwU7mgQeVjgw6qNpyYTV3Z7CgtxueBdsA"
+
+	authorizationRequestWithMessage := auth.CreateAuthorizationRequestWithMessage("12345", "message", VerifierIdentity, CallBackUrl)
+	authorizationRequestWithMessage.To = request.Body.To
+	authorizationRequestWithMessage.ID = request.Body.Id
+	authorizationRequestWithMessage.ThreadID = request.Body.Thid
+
+	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
+	mtpProofRequest.ID = 10
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	mtpProofRequest.Query = map[string]interface{}{
+		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"},
+		"credentialSubject": map[string]interface{}{
+			"birthday": map[string]interface{}{
+				"$lt": float64(20221010),
+			},
+		},
+		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
+		"type":    "KYCAgeCredential",
+	}
+	authorizationRequestWithMessage.Body.Scope = append(authorizationRequestWithMessage.Body.Scope, mtpProofRequest)
+
+	q := ports.Query{}
+	requestQuery := authorizationRequestWithMessage.Body.Scope[0].Query;
+	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	q.SkipClaimRevocationCheck = false
+	q.Challenge = big.NewInt(6789)
+	// TODO
+	q.ClaimID = "f621070e-caf5-11ed-a093-000c2949382b"
+	q.AllowedIssuers = requestQuery["allowedIssuers"].([]string)[0]
+	q.Type = requestQuery["type"].(string)
+	q.Context = requestQuery["context"].(string)
+	q.Req = requestQuery["credentialSubject"].(map[string]interface{})
+
+	formatted_data, err := json.MarshalIndent(authorizationRequestWithMessage, "", " ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(formatted_data))
+
+
+	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
+	
+	return GenerateProof200JSONResponse{Id: authProof.Proof.Protocol + authorizationRequestWithMessage.ID}, nil
+
 }
 
 // CreateClaim is claim creation controller

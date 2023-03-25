@@ -97,6 +97,37 @@ func (a *authRequest) CreateAuthRequest(ctx context.Context, req *ports.CreateAu
 	return request, err
 }
 
+func (a *authRequest) CreateAuthorizationRequestMessage(ctx context.Context, req *ports.CreateQueryRequestRequest) (protocol.AuthorizationRequestMessage, error) {
+	err := a.guardCreateQueryRequestRequest(req)
+	if err != nil {
+		log.Warn(ctx, "validating create queryRequest request", "req", req)
+	}
+
+	const CallBackUrl = "http:localhost:8001/call-back"
+	const VerifierIdentity = "did:polygonid:polygon:mumbai:2qJT3RnL8ZwU7mgQeVjgw6qNpyYTV3Z7CgtxueBdsA"
+
+	request := auth.CreateAuthorizationRequestWithMessage("12345", "message", VerifierIdentity, CallBackUrl)
+	request.To = req.DID.String()
+	request.ID = "6789"
+	request.ThreadID = "7f38a193-0918-4a48-9fac-36adfdb8b542"
+
+	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
+	mtpProofRequest.ID = 10
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	mtpProofRequest.Query = map[string]interface{}{
+		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"},
+		"credentialSubject": map[string]interface{}{
+			"birthday": map[string]interface{}{
+				"$lt": float64(20221010),
+			},
+		},
+		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
+		"type":    "KYCAgeCredential",
+	}
+	request.Body.Scope = append(request.Body.Scope, mtpProofRequest)
+	return request, err
+}
+
 func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQueryRequestRequest) (protocol.AuthorizationRequestMessage, error) {
 	err := a.guardCreateQueryRequestRequest(req)
 	if err != nil {

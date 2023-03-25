@@ -437,6 +437,41 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+#generate_proof:
+  /v1/{identifier}/generate-proof:
+    post:
+      summary: Request a proof generation
+      operationId: GenerateProof
+      description: Endpoint to send a proof generation request
+      tags:
+        - GenerateProof
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/pathIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateProofRequest'
+      responses:
+        '200':
+          description: Proof generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateProofResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+        '500':
+          $ref: '#/components/responses/500'
+
+
 components:
   securitySchemes:
     basicAuth:
@@ -655,6 +690,133 @@ components:
           type: string
           x-omitempty: false
     
+    #generate-proof
+    GenerateProofRequest:
+      type: object
+      required:
+        - id
+        - typ
+        - type
+        - thid
+        - body
+        - from
+        - to
+      properties:
+        id:
+          type: string
+          x-omitempty: false
+        typ:
+          type: string
+          x-omitempty: false
+        type:
+          type: string
+          x-omitempty: false
+        thid:
+          type: string
+          x-omitempty: false
+        body:
+          $ref: '#/components/schemas/GenerateProofRequestBody'
+          x-omitempty: false
+        from:
+          type: string
+          x-omitempty: false
+        to:
+          type: string
+          x-omitempty: false
+      example:
+          id: "6789"
+          typ: "application/iden3comm-plain-json"
+          type: "https://iden3-communication.io/authorization/1.0/request"
+          thid: "7f38a193-0918-4a48-9fac-36adfdb8b542"
+          body: 
+            callbackUrl: "http:localhost:8001/call-back"
+            reason: "12345"
+            message: "message"
+            scope: 
+              id: 10,
+              circuitId: "credentialAtomicQueryMTPV2OnChain"
+              query: 
+                allowedIssuers: "did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"
+                context: "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
+                credentialSubject: 
+                  birthday: 
+                    $lt: 20221010
+                type: "KYCAgeCredential"
+          from: "did:polygonid:polygon:mumbai:2qJT3RnL8ZwU7mgQeVjgw6qNpyYTV3Z7CgtxueBdsA"
+          to: "did:polygonid:polygon:mumbai:2qPnH3D8bu1FxuA28g3mtrhmGNxc5VvcZgj22cyFB1"
+
+    GenerateProofRequestBody:
+      type: object
+      required:
+        - callbackUrl
+        - reason
+        - message
+      properties:
+        callbackUrl:
+          type: string
+          x-omitempty: false
+        reason:
+          type: string
+          x-omitempty: false
+        message:
+          type: string
+          x-omitempty: false
+        scope: 
+          type: array
+          items:
+            $ref: '#/components/schemas/GenerateProofRequestScope'
+        
+
+    GenerateProofRequestScope:
+      type: object
+      required:
+        - id
+        - circuitId
+        - query
+      properties:
+        id:
+          type: string
+          x-omitempty: false
+        circuitId:
+          type: string
+          x-omitempty: false
+        query:
+          $ref: '#/components/schemas/GenerateProofRequestQuery'
+          x-omitempty: false
+
+
+    GenerateProofRequestQuery:
+      type: object
+      required:
+        - allowedIssuers
+        - context
+        - credentialSubject
+        - type
+      properties:
+        allowedIssuers:
+          type: array
+          items:
+            type: string
+          x-omitempty: false
+        context:
+          type: string
+          x-omitempty: false
+        credentialSubject:
+          type: object
+          x-omitempty: false
+        type:
+          type: string
+          x-omitempty: false
+
+    GenerateProofResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          x-omitempty: false
+          
     #claims
     CreateClaimRequest:
       type: object

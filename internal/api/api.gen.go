@@ -109,6 +109,45 @@ type CredentialSchema struct {
 	Type string `json:"type"`
 }
 
+// GenerateProofRequest defines model for GenerateProofRequest.
+type GenerateProofRequest struct {
+	Body GenerateProofRequestBody `json:"body"`
+	From string                   `json:"from"`
+	Id   string                   `json:"id"`
+	Thid string                   `json:"thid"`
+	To   string                   `json:"to"`
+	Typ  string                   `json:"typ"`
+	Type string                   `json:"type"`
+}
+
+// GenerateProofRequestBody defines model for GenerateProofRequestBody.
+type GenerateProofRequestBody struct {
+	CallbackUrl string                       `json:"callbackUrl"`
+	Message     string                       `json:"message"`
+	Reason      string                       `json:"reason"`
+	Scope       *[]GenerateProofRequestScope `json:"scope,omitempty"`
+}
+
+// GenerateProofRequestQuery defines model for GenerateProofRequestQuery.
+type GenerateProofRequestQuery struct {
+	AllowedIssuers    []string               `json:"allowedIssuers"`
+	Context           string                 `json:"context"`
+	CredentialSubject map[string]interface{} `json:"credentialSubject"`
+	Type              string                 `json:"type"`
+}
+
+// GenerateProofRequestScope defines model for GenerateProofRequestScope.
+type GenerateProofRequestScope struct {
+	CircuitId string                    `json:"circuitId"`
+	Id        string                    `json:"id"`
+	Query     GenerateProofRequestQuery `json:"query"`
+}
+
+// GenerateProofResponse defines model for GenerateProofResponse.
+type GenerateProofResponse struct {
+	Id string `json:"id"`
+}
+
 // GenericErrorMessage defines model for GenericErrorMessage.
 type GenericErrorMessage struct {
 	Message string `json:"message"`
@@ -276,6 +315,9 @@ type CreateAuthRequestJSONRequestBody = CreateAuthRequestRequest
 // CreateClaimJSONRequestBody defines body for CreateClaim for application/json ContentType.
 type CreateClaimJSONRequestBody = CreateClaimRequest
 
+// GenerateProofJSONRequestBody defines body for GenerateProof for application/json ContentType.
+type GenerateProofJSONRequestBody = GenerateProofRequest
+
 // CreateQueryRequestJSONRequestBody defines body for CreateQueryRequest for application/json ContentType.
 type CreateQueryRequestJSONRequestBody = CreateQueryRequestRequest
 
@@ -323,6 +365,9 @@ type ServerInterface interface {
 	// Get Claim QR code
 	// (GET /v1/{identifier}/claims/{id}/qrcode)
 	GetClaimQrCode(w http.ResponseWriter, r *http.Request, identifier PathIdentifier, id PathClaim)
+	// Request a proof generation
+	// (POST /v1/{identifier}/generate-proof)
+	GenerateProof(w http.ResponseWriter, r *http.Request, identifier PathIdentifier)
 	// Create Query Request
 	// (POST /v1/{identifier}/query-reqs)
 	CreateQueryRequest(w http.ResponseWriter, r *http.Request, identifier PathIdentifier)
@@ -732,6 +777,34 @@ func (siw *ServerInterfaceWrapper) GetClaimQrCode(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r.WithContext(ctx))
 }
 
+// GenerateProof operation middleware
+func (siw *ServerInterfaceWrapper) GenerateProof(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "identifier" -------------
+	var identifier PathIdentifier
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "identifier", runtime.ParamLocationPath, chi.URLParam(r, "identifier"), &identifier)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "identifier", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BasicAuthScopes, []string{""})
+
+	var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GenerateProof(w, r, identifier)
+	})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
 // CreateQueryRequest operation middleware
 func (siw *ServerInterfaceWrapper) CreateQueryRequest(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -942,6 +1015,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/v1/{identifier}/claims/{id}/qrcode", wrapper.GetClaimQrCode)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/v1/{identifier}/generate-proof", wrapper.GenerateProof)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/v1/{identifier}/query-reqs", wrapper.CreateQueryRequest)
@@ -1504,6 +1580,60 @@ func (response GetClaimQrCode500JSONResponse) VisitGetClaimQrCodeResponse(w http
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GenerateProofRequestObject struct {
+	Identifier PathIdentifier `json:"identifier"`
+	Body       *GenerateProofJSONRequestBody
+}
+
+type GenerateProofResponseObject interface {
+	VisitGenerateProofResponse(w http.ResponseWriter) error
+}
+
+type GenerateProof200JSONResponse GenerateProofResponse
+
+func (response GenerateProof200JSONResponse) VisitGenerateProofResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GenerateProof400JSONResponse struct{ N400JSONResponse }
+
+func (response GenerateProof400JSONResponse) VisitGenerateProofResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GenerateProof401JSONResponse struct{ N401JSONResponse }
+
+func (response GenerateProof401JSONResponse) VisitGenerateProofResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(401)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GenerateProof422JSONResponse struct{ N422JSONResponse }
+
+func (response GenerateProof422JSONResponse) VisitGenerateProofResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(422)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GenerateProof500JSONResponse struct{ N500JSONResponse }
+
+func (response GenerateProof500JSONResponse) VisitGenerateProofResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type CreateQueryRequestRequestObject struct {
 	Identifier PathIdentifier `json:"identifier"`
 	Body       *CreateQueryRequestJSONRequestBody
@@ -1655,6 +1785,9 @@ type StrictServerInterface interface {
 	// Get Claim QR code
 	// (GET /v1/{identifier}/claims/{id}/qrcode)
 	GetClaimQrCode(ctx context.Context, request GetClaimQrCodeRequestObject) (GetClaimQrCodeResponseObject, error)
+	// Request a proof generation
+	// (POST /v1/{identifier}/generate-proof)
+	GenerateProof(ctx context.Context, request GenerateProofRequestObject) (GenerateProofResponseObject, error)
 	// Create Query Request
 	// (POST /v1/{identifier}/query-reqs)
 	CreateQueryRequest(ctx context.Context, request CreateQueryRequestRequestObject) (CreateQueryRequestResponseObject, error)
@@ -2084,6 +2217,39 @@ func (sh *strictHandler) GetClaimQrCode(w http.ResponseWriter, r *http.Request, 
 	}
 }
 
+// GenerateProof operation middleware
+func (sh *strictHandler) GenerateProof(w http.ResponseWriter, r *http.Request, identifier PathIdentifier) {
+	var request GenerateProofRequestObject
+
+	request.Identifier = identifier
+
+	var body GenerateProofJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GenerateProof(ctx, request.(GenerateProofRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GenerateProof")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GenerateProofResponseObject); ok {
+		if err := validResponse.VisitGenerateProofResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("Unexpected response type: %T", response))
+	}
+}
+
 // CreateQueryRequest operation middleware
 func (sh *strictHandler) CreateQueryRequest(w http.ResponseWriter, r *http.Request, identifier PathIdentifier) {
 	var request CreateQueryRequestRequestObject
@@ -2146,55 +2312,65 @@ func (sh *strictHandler) PublishIdentityState(w http.ResponseWriter, r *http.Req
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"PwEAAP//9RwN0cBSAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
