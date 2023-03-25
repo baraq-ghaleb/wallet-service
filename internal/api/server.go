@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -205,19 +206,38 @@ func (s *Server) CreateQueryRequest(ctx context.Context, request CreateQueryRequ
 		return CreateQueryRequest500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	}
 
+	// q := ports.Query{}
+	// q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	// q.SkipClaimRevocationCheck = false
+	// q.AllowedIssuers = "did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"
+	// q.Type = "KYCAgeCredential"
+	// q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
+	// q.Req = map[string]interface{}{
+	// 	"birthday": map[string]interface{}{
+	// 		"$lt": float64(20221010),
+	// 	},
+	// }
+	// q.Challenge = big.NewInt(6789)
+	// q.ClaimID = "f621070e-caf5-11ed-a093-000c2949382b"
+
+
 	q := ports.Query{}
+	requestQuery := queryRequest.Body.Scope[0].Query;
 	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	q.SkipClaimRevocationCheck = false
-	q.AllowedIssuers = "did:polygonid:polygon:mumbai:2qKLGWv7JX9fsvGdUupnhE1TMS3rYKEUSu5FHTAX6j"
-	q.Type = "KYCAgeCredential"
-	q.Context = "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld"
-	q.Req = map[string]interface{}{
-		"birthday": map[string]interface{}{
-			"$lt": float64(20221010),
-		},
-	}
 	q.Challenge = big.NewInt(6789)
-	q.ClaimID = "32421df5-c43f-11ed-928a-000c2949382b"
+	// TODO
+	q.ClaimID = "f621070e-caf5-11ed-a093-000c2949382b"
+	q.AllowedIssuers = requestQuery["allowedIssuers"].([]string)[0]
+	q.Type = requestQuery["type"].(string)
+	q.Context = requestQuery["context"].(string)
+	q.Req = requestQuery["credentialSubject"].(map[string]interface{})
+
+	formatted_data, err := json.MarshalIndent(request, "", " ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(formatted_data))
 
 
 	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)

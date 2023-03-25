@@ -115,18 +115,16 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 	mtpProofRequest.ID = 10
 	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
-		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qKLGWv7JX9fsvGdUupnhE1TMS3rYKEUSu5FHTAX6j"},
+		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"},
 		"credentialSubject": map[string]interface{}{
 			"birthday": map[string]interface{}{
-				"$lt": 20221010,
+				"$lt": float64(20221010),
 			},
 		},
 		"context": "https://raw.githubusercontent.com/iden3/claim-schema-vocab/main/schemas/json-ld/kyc-v3.json-ld",
 		"type":    "KYCAgeCredential",
 	}
-
 	request.Body.Scope = append(request.Body.Scope, mtpProofRequest)
-
 	return request, err
 }
 
