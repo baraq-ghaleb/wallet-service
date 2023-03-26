@@ -309,6 +309,7 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	requestQuery := authorizationRequestWithMessage.Body.Scope[0].Query;
 	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
 	q.SkipClaimRevocationCheck = false
+	// TODO
 	q.Challenge = big.NewInt(6789)
 	// TODO
 	q.ClaimID = "f621070e-caf5-11ed-a093-000c2949382b"
@@ -317,19 +318,24 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	q.Context = requestQuery["context"].(string)
 	q.Req = requestQuery["credentialSubject"].(map[string]interface{})
 
-	formatted_data, err := json.MarshalIndent(authorizationRequestWithMessage, "", " ")
+	generatedProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
+	
+	f_data, err := json.MarshalIndent(generatedProof, "", " ")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(formatted_data))
+	fmt.Println(string(f_data))
 
-
-	authProof, err := s.proofService.GenerateAgeProof(ctx, did, q)
+	var proof GenerateProofResponseProof
+	proof.PiA = generatedProof.Proof.A
+	proof.PiB = generatedProof.Proof.B
+	proof.PiC = generatedProof.Proof.C
+	proof.PiA = generatedProof.Proof.A
 	
 	if (err != nil) {
 		return GenerateProof500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	} 
-	return GenerateProof200JSONResponse{Id: authProof.Proof.Protocol + authorizationRequestWithMessage.ID}, nil
+	return GenerateProof200JSONResponse{Proof: &proof, PubSignals: &generatedProof.PubSignals}, nil
 
 }
 

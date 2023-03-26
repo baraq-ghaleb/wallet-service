@@ -811,12 +811,44 @@ components:
     GenerateProofResponse:
       type: object
       required:
-        - id
       properties:
-        id:
-          type: string
+        proof:
+          $ref: '#/components/schemas/GenerateProofResponseProof'
           x-omitempty: false
-          
+        pub_signals:
+          type: array
+          items:
+            type: string
+          x-omitempty: false
+
+    stringArray:
+      type: array
+      items:
+            type: string
+
+    GenerateProofResponseProof:
+      type: object
+      required:
+        - pi_a
+        - pi_b
+        - pi_c
+      properties:
+        pi_a:
+          type: array
+          items:
+            type: string
+          x-omitempty: false
+        pi_b:
+          type: array
+          items:
+            $ref: '#/components/schemas/stringArray'
+          x-omitempty: false
+        pi_c:
+          type: array
+          items:
+            type: string
+          x-omitempty: false      
+
     #claims
     CreateClaimRequest:
       type: object
