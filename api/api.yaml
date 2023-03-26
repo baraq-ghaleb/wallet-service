@@ -471,6 +471,39 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 
+#verify_proof:
+  /v1/{identifier}/verify-proof:
+    post:
+      summary: Request a proof verification
+      operationId: VerifyProof
+      description: Endpoint to send a proof verification request
+      tags:
+        - VerifyProof
+      security:
+        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/pathIdentifier'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyProofRequest'
+      responses:
+        '200':
+          description: Proof verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyProofResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '422':
+          $ref: '#/components/responses/422'
+        '500':
+          $ref: '#/components/responses/500'
 
 components:
   securitySchemes:
@@ -832,6 +865,7 @@ components:
         - pi_a
         - pi_b
         - pi_c
+        - protocol
       properties:
         pi_a:
           type: array
@@ -847,8 +881,36 @@ components:
           type: array
           items:
             type: string
-          x-omitempty: false      
+          x-omitempty: false   
+        protocol:
+          type: string
+          x-omitempty: false    
 
+    #generate-proof
+    VerifyProofRequest:
+      type: object
+      required:
+        - generateProofRequest
+        - generateProofResponse
+      properties:
+        generateProofRequest:
+          $ref: '#/components/schemas/GenerateProofRequest'
+          x-omitempty: false
+        generateProofResponse:
+          $ref: '#/components/schemas/GenerateProofResponse'
+          x-omitempty: false
+     
+
+    VerifyProofResponse:
+      type: object
+      required:
+        - verified
+      properties:
+        verified:
+          type: boolean
+          x-omitempty: false
+
+      
     #claims
     CreateClaimRequest:
       type: object

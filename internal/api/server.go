@@ -330,13 +330,78 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	proof.PiA = generatedProof.Proof.A
 	proof.PiB = generatedProof.Proof.B
 	proof.PiC = generatedProof.Proof.C
-	proof.PiA = generatedProof.Proof.A
+	proof.Protocol = generatedProof.Proof.Protocol
 	
 	if (err != nil) {
 		return GenerateProof500JSONResponse{N500JSONResponse{Message: err.Error()}}, nil
 	} 
 	return GenerateProof200JSONResponse{Proof: &proof, PubSignals: &generatedProof.PubSignals}, nil
+}
 
+func (s *Server) VerifyProof(ctx context.Context, request VerifyProofRequestObject) (VerifyProofResponseObject, error) {
+
+	const CallBackUrl = "http:localhost:8001/call-back"
+	verifierIdentity := request.Body.GenerateProofRequest.From
+	reason := request.Body.GenerateProofRequest.Body.Reason
+	message := request.Body.GenerateProofRequest.Body.Message
+	allowedIssuers := (*request.Body.GenerateProofRequest.Body.Scope)[0].Query.AllowedIssuers
+	context := (*request.Body.GenerateProofRequest.Body.Scope)[0].Query.Context
+	_type := (*request.Body.GenerateProofRequest.Body.Scope)[0].Query.Type
+	credentialSubject := (*request.Body.GenerateProofRequest.Body.Scope)[0].Query.CredentialSubject
+	
+	authorizationRequestWithMessage := auth.CreateAuthorizationRequestWithMessage(reason, message, verifierIdentity, CallBackUrl)
+	authorizationRequestWithMessage.To = request.Body.GenerateProofRequest.To
+	authorizationRequestWithMessage.ID = request.Body.GenerateProofRequest.Id
+	authorizationRequestWithMessage.ThreadID = request.Body.GenerateProofRequest.Thid
+
+	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
+	mtpProofRequest.ID = 10
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	mtpProofRequest.Query = map[string]interface{}{
+		"allowedIssuers": allowedIssuers,
+		"credentialSubject": credentialSubject,
+		"context": context,
+		"type":    _type,
+	}
+	authorizationRequestWithMessage.Body.Scope = append(authorizationRequestWithMessage.Body.Scope, mtpProofRequest)
+
+
+
+
+
+	var authorizationResponseMessage protocol.AuthorizationResponseMessage
+	authorizationResponseMessage.Typ = packers.MediaTypePlainMessage
+	authorizationResponseMessage.Type = protocol.AuthorizationResponseMessageType
+	authorizationResponseMessage.From = request.Body.GenerateProofRequest.To
+	authorizationResponseMessage.To = request.Body.GenerateProofRequest.From
+	authorizationResponseMessage.ID = uuid.New().String()
+	authorizationResponseMessage.ThreadID = request.Body.GenerateProofRequest.Thid
+	var proofData types.ProofData
+	proofData.A = request.Body.GenerateProofResponse.Proof.PiA
+	proofData.B = request.Body.GenerateProofResponse.Proof.PiB
+	proofData.C = request.Body.GenerateProofResponse.Proof.PiC
+	proofData.Protocol = request.Body.GenerateProofResponse.Proof.Protocol
+
+	authorizationResponseMessage.Body = protocol.AuthorizationMessageResponseBody{
+		Message: request.Body.GenerateProofRequest.Body.Message,
+		Scope: []protocol.ZeroKnowledgeProofResponse{
+			{
+				ID:        10,
+				CircuitID: string(circuits.AtomicQueryMTPV2OnChainCircuitID),
+				ZKProof: types.ZKProof{
+					Proof:      &proofData,
+					PubSignals: *request.Body.GenerateProofResponse.PubSignals,
+				},
+			},
+		},
+	}
+
+	verified := s.reqService.VerifyAuthRequestResponse(ctx, &authorizationRequestWithMessage, &authorizationResponseMessage)
+		
+	if !verified {
+		return VerifyProof500JSONResponse{N500JSONResponse{}}, nil
+	} 
+	return VerifyProof200JSONResponse{Verified: verified}, nil
 }
 
 // CreateClaim is claim creation controller

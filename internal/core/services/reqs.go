@@ -160,6 +160,7 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 }
 
 func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) bool {
+	// TODO
 	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/credentialAtomicQueryMTPV2OnChain"
 	// circuitsLoaderService := pkgloader.NewCircuits("/home/zakwan/wallet-service/pkg/credentials/circuits")
 
@@ -167,6 +168,7 @@ func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizati
 
 	var verificationKeyloader = &loaders.FSKeyLoader{Dir: keyDIR}
 
+	// TODO
 	URL := "https://polygon-mumbai.g.alchemy.com/v2/jNN6BxHCdHmxeTFcHHz-6DG7VTqX1tPY"
 	contractAddress := "0x134B1BE34911E39A8397ec6289782989729807a4"
 
