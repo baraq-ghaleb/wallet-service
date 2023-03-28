@@ -113,7 +113,8 @@ func (a *authRequest) CreateAuthorizationRequestMessage(ctx context.Context, req
 
 	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
 	mtpProofRequest.ID = 10
-	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	// TODO OnChain
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2CircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
 		"allowedIssuers": []string{"did:polygonid:polygon:mumbai:2qFjyCGFs4yNEnUC4wec7YoTcoQGCHAbn3Ur8r49FS"},
 		"credentialSubject": map[string]interface{}{
@@ -160,8 +161,8 @@ func (a *authRequest) CreateQueryRequest(ctx context.Context, req *ports.CreateQ
 }
 
 func (a *authRequest) VerifyAuthRequestResponse(ctx context.Context, authorizationRequestMessage *protocol.AuthorizationRequestMessage, authorizationResponseMessage *protocol.AuthorizationResponseMessage) bool {
-	// TODO
-	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/credentialAtomicQueryMTPV2OnChain"
+	// TODO OnChain
+	keyDIR := "/home/zakwan/wallet-service/pkg/credentials/circuits/credentialAtomicQueryMTPV2"
 	// circuitsLoaderService := pkgloader.NewCircuits("/home/zakwan/wallet-service/pkg/credentials/circuits")
 
 	// authV2Set, err := circuitsLoaderService.Load(circuits.AuthV2CircuitID)

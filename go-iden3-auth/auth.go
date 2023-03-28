@@ -131,10 +131,10 @@ func (v *Verifier) VerifyAuthResponse(
 		}
 
 		// TODO: re-add the VerifyQuery check
-		// err = cv.VerifyQuery(ctx, query, v.claimSchemaLoader, rawMessage)
-		// if err != nil {
-		// 	return err
-		// }
+		err = cv.VerifyQuery(ctx, query, v.claimSchemaLoader, rawMessage)
+		if err != nil {
+			return err
+		}
 
 		err = cv.VerifyStates(ctx, v.stateResolver, opts...)
 		if err != nil {

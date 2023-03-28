@@ -210,13 +210,15 @@ func (p *Proof) prepareAtomicQueryMTPV2Circuit(ctx context.Context, did *core.DI
 		return nil, nil, err
 	}
 
+	issuerDidLastPart := claim.Issuer[strings.LastIndex(claim.Issuer, ":")+1:]
+	issuerId, _ := core.IDFromString(issuerDidLastPart)
 	inputs := circuits.AtomicQueryMTPV2Inputs{
 		RequestID:                big.NewInt(defaultAtomicCircuitsID),
 		ID:                       &did.ID,
 		ProfileNonce:             big.NewInt(0),
 		ClaimSubjectProfileNonce: big.NewInt(0),
 		Claim: circuits.ClaimWithMTPProof{
-			IssuerID:    &did.ID, // claim.Issuer,
+			IssuerID:    &issuerId,
 			Claim:       claim.CoreClaim.Get(),
 			NonRevProof: *claimNonRevProof,
 			IncProof:    claimInc,
@@ -855,8 +857,8 @@ func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, quer
 	if err != nil {
 		return nil, err
 	}
-
-	fullProof, err := p.zkService.Generate(ctx, circuitInputs, string(circuits.AtomicQueryMTPV2OnChainCircuitID))
+	// TODO OnChain
+	fullProof, err := p.zkService.Generate(ctx, circuitInputs, string(circuits.AtomicQueryMTPV2CircuitID))
 	if err != nil {
 		return nil, err
 	}

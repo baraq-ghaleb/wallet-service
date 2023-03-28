@@ -291,12 +291,14 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	
 	authorizationRequestWithMessage := auth.CreateAuthorizationRequestWithMessage(reason, message, verifierIdentity, CallBackUrl)
 	authorizationRequestWithMessage.To = request.Body.To
+	authorizationRequestWithMessage.From = did.String()
 	authorizationRequestWithMessage.ID = request.Body.Id
 	authorizationRequestWithMessage.ThreadID = request.Body.Thid
 
 	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
 	mtpProofRequest.ID = 10
-	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	// TODO: AtomicQueryMTPV2OnChainCircuitID
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2CircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
 		"allowedIssuers": allowedIssuers,
 		"credentialSubject": credentialSubject,
@@ -307,7 +309,8 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 
 	q := ports.Query{}
 	requestQuery := authorizationRequestWithMessage.Body.Scope[0].Query;
-	q.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	// TODO: AtomicQueryMTPV2OnChainCircuitID
+	q.CircuitID = string(circuits.AtomicQueryMTPV2CircuitID)
 	q.SkipClaimRevocationCheck = false
 	// TODO
 	q.Challenge = big.NewInt(6789)
@@ -356,7 +359,8 @@ func (s *Server) VerifyProof(ctx context.Context, request VerifyProofRequestObje
 
 	var mtpProofRequest protocol.ZeroKnowledgeProofRequest
 	mtpProofRequest.ID = 10
-	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2OnChainCircuitID)
+	// TODO OnChain
+	mtpProofRequest.CircuitID = string(circuits.AtomicQueryMTPV2CircuitID)
 	mtpProofRequest.Query = map[string]interface{}{
 		"allowedIssuers": allowedIssuers,
 		"credentialSubject": credentialSubject,
@@ -365,11 +369,7 @@ func (s *Server) VerifyProof(ctx context.Context, request VerifyProofRequestObje
 	}
 	authorizationRequestWithMessage.Body.Scope = append(authorizationRequestWithMessage.Body.Scope, mtpProofRequest)
 
-
-
-
-
-	var authorizationResponseMessage protocol.AuthorizationResponseMessage
+    var authorizationResponseMessage protocol.AuthorizationResponseMessage
 	authorizationResponseMessage.Typ = packers.MediaTypePlainMessage
 	authorizationResponseMessage.Type = protocol.AuthorizationResponseMessageType
 	authorizationResponseMessage.From = request.Body.GenerateProofRequest.To
@@ -387,7 +387,8 @@ func (s *Server) VerifyProof(ctx context.Context, request VerifyProofRequestObje
 		Scope: []protocol.ZeroKnowledgeProofResponse{
 			{
 				ID:        10,
-				CircuitID: string(circuits.AtomicQueryMTPV2OnChainCircuitID),
+				// TODO OnChain
+				CircuitID: string(circuits.AtomicQueryMTPV2CircuitID),
 				ZKProof: types.ZKProof{
 					Proof:      &proofData,
 					PubSignals: *request.Body.GenerateProofResponse.PubSignals,

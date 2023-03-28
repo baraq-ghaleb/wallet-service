@@ -64,21 +64,22 @@ func (q Query) Check(
 	pubSig *CircuitOutputs,
 	verifiablePresentation json.RawMessage,
 ) error {
+	// TODO
 	if err := q.verifyIssuer(pubSig); err != nil {
 		return err
 	}
 
-	// if err := q.verifySchemaID(pubSig); err != nil {
-	// 	return err
-	// }
+	if err := q.verifySchemaID(pubSig); err != nil {
+		return err
+	}
 
-	// if err := q.verifyCredentialSubject(pubSig, verifiablePresentation); err != nil {
-	// 	return err
-	// }
+	if err := q.verifyCredentialSubject(pubSig, verifiablePresentation); err != nil {
+		return err
+	}
 
-	// if !q.SkipClaimRevocationCheck && pubSig.IsRevocationChecked == 0 {
-	// 	return errors.New("check revocation is required")
-	// }
+	if !q.SkipClaimRevocationCheck && pubSig.IsRevocationChecked == 0 {
+		return errors.New("check revocation is required")
+	}
 
 	schemaBytes, _, err := loader.Load(ctx, q.Context)
 	if err != nil {
@@ -176,9 +177,9 @@ func (q Query) verifyCredentialSubject(pubSig *CircuitOutputs, verifiablePresent
 		return err
 	}
 
-	if operator != pubSig.Operator {
-		return ErrRequestOperator
-	}
+	// if operator != pubSig.Operator {
+	// 	return ErrRequestOperator
+	// }
 
 	if operator == circuits.NOOP {
 		return nil
