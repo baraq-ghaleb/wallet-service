@@ -315,7 +315,7 @@ func (s *Server) GenerateProof(ctx context.Context, request GenerateProofRequest
 	// TODO
 	q.Challenge = big.NewInt(6789)
 	// TODO
-	q.ClaimID = "f621070e-caf5-11ed-a093-000c2949382b"
+	// q.ClaimID = "f621070e-caf5-11ed-a093-000c2949382b"
 	q.AllowedIssuers = requestQuery["allowedIssuers"].([]string)[0]
 	q.Type = requestQuery["type"].(string)
 	q.Context = requestQuery["context"].(string)

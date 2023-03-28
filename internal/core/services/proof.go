@@ -848,8 +848,6 @@ func (p *Proof) GenerateAgeProof(ctx context.Context, identifier *core.DID, quer
 
 	circuitInputs, claim, err := p.PrepareInputs(ctx, identifier, query)
 
-	//circuitInputs, claim, err := p.prepareAtomicQueryMTPV2Circuit(ctx, identifier, query)
-
 	if claim == nil {
 		return nil, err
 	}

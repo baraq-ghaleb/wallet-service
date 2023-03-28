@@ -516,7 +516,7 @@ func processClaims(rows pgx.Rows) ([]*domain.Claim, error) {
 
 func buildGetAllQueryAndFilters(identifier *core.DID, filter *ports.Filter, query *string) []interface{} {
 	filters := []interface{}{identifier.String()}
-	*query = fmt.Sprintf("%s WHERE claims.identifier = $%d", *query, len(filters))
+	*query = fmt.Sprintf("%s WHERE claims.other_identifier = $%d", *query, len(filters))
 
 	if filter.Self != nil && *filter.Self {
 		*query = fmt.Sprintf("%s and other_identifier = ''", *query)
